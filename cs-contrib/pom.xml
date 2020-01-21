@@ -1,0 +1,171 @@
+<project
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
+>
+  <modelVersion>4.0.0</modelVersion>
+  
+  <groupId>de.unkrig.checkstyle</groupId>
+  <artifactId>cs-contrib</artifactId>
+  <version>1.0.1</version>
+
+  <name>de.unkrig.cs-contrib - Additional checks, filters and quickfixes for CheckStyle and Eclipse-CS</name>
+  <description>
+    This version works with most CheckStyle versions up to and including 8.20, but not with later CS versions,
+    because they unintentionally made a breaking change in version 8.21 (class DetailAst was changed to an interface).
+  </description>
+  <url>http://cs-contrib.unkrig.de/</url>
+  <licenses>
+    <license>
+      <name>New BSD License</name>
+      <url>https://raw.githubusercontent.com/janino-compiler/janino/master/LICENSE</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+  	<developerConnection>scm:git:https://github.com/aunkrig/cs-contrib</developerConnection>
+  	<url>https://github.com/aunkrig/cs-contrib</url>
+  </scm>
+  <developers>
+    <developer>
+      <id>aunkrig</id>
+      <name>Arno Unkrig</name>
+      <roles>
+        <role>Despot</role>
+        <role>Developer</role>
+      </roles>
+    </developer>
+  </developers>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>1.6</maven.compiler.source>
+    <maven.compiler.target>1.6</maven.compiler.target>
+  </properties>
+  
+  <dependencies>
+    <dependency>
+      <groupId>com.puppycrawl.tools</groupId>
+      <artifactId>checkstyle</artifactId>
+      <version>8.19</version>
+    </dependency>
+    <dependency>
+      <groupId>de.unkrig.commons</groupId>
+      <artifactId>commons-nullanalysis</artifactId>
+      <version>1.2.14</version>
+    </dependency>
+    <dependency>
+      <groupId>de.unkrig</groupId>
+      <artifactId>doclet-cs-annotation</artifactId>
+      <version>1.0.2-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jarsigner-plugin</artifactId>
+        <version>1.4</version>
+        <executions>
+          <execution>
+            <id>sign</id>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <keystore>dummy-keystore</keystore>
+          <alias>dummy</alias>
+          <storepass>storepass</storepass>
+          <keypass>keypass</keypass>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.10.4</version>
+        <configuration>
+          <quiet>true</quiet>
+          <additionalparam>-Xdoclint:none</additionalparam>
+        </configuration>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>2.4</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <version>1.6.7</version>
+        <extensions>true</extensions>
+        <configuration>
+           <serverId>ossrh</serverId>
+           <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+           <autoReleaseAfterClose>false</autoReleaseAfterClose>
+        </configuration>
+      </plugin>
+    </plugins>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-gpg-plugin</artifactId>
+          <version>1.5</version>
+          <executions>
+            <execution>
+              <id>sign-artifacts</id>
+              <phase>verify</phase>
+              <goals><goal>sign</goal></goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <profiles>
+
+    <!-- Signs all artifacts with GPG (oss.sonatype.org requires that). -->
+    <profile>
+      <id>have_gpg</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>
