@@ -45,8 +45,8 @@ import de.unkrig.csdoclet.annotation.Rule;
     group      = "%Coding.group",
     groupName  = "Coding Problems",
     name       = "de.unkrig: Inner assignment",
-    parent     = "TreeWalker"
-//    quickfixes = { de.unkrig.cscontrib.ui.quickfixes.InnerAssignment.class } TODO
+    parent     = "TreeWalker",
+    quickfixes = "de.unkrig.cscontrib.ui.quickfixes.InnerAssignment"
 ) @NotNullByDefault(false) public
 class InnerAssignment extends AbstractCheck {
 

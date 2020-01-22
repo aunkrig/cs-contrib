@@ -47,8 +47,8 @@ import de.unkrig.csdoclet.annotation.Rule;
     group      = "%Coding.group",
     groupName  = "Coding Problems",
     name       = "de.unkrig: Zero-parameter superconstructor invocation",
-    parent     = "TreeWalker"
-//    quickfixes = { de.unkrig.cscontrib.ui.quickfixes.ZeroParameterSuperconstructorInvocation.class } TODO
+    parent     = "TreeWalker",
+    quickfixes = "de.unkrig.cscontrib.ui.quickfixes.ZeroParameterSuperconstructorInvocation"
 )
 @NotNullByDefault(false) public
 class ZeroParameterSuperconstructorInvocation extends AbstractCheck {

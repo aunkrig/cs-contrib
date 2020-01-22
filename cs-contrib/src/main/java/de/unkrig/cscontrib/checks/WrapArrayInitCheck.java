@@ -65,8 +65,12 @@ import de.unkrig.csdoclet.annotation.SingleSelectRuleProperty;
     group      = "%Whitespace.group",
     groupName  = "Whitespace",
     name       = "de.unkrig: Wrap array initializer",
-    parent     = "TreeWalker"
-//    quickfixes = { WrapAndIndent1.class, WrapAndIndent2.class, WrapAndIndent3.class } TODO
+    parent     = "TreeWalker",
+    quickfixes = {
+		"de.unkrig.cscontrib.ui.quickfixes.WrapAndIndent1",
+		"de.unkrig.cscontrib.ui.quickfixes.WrapAndIndent2",
+		"de.unkrig.cscontrib.ui.quickfixes.WrapAndIndent3",
+	}
 )
 @NotNullByDefault(false) public
 class WrapArrayInitCheck extends AbstractWrapCheck {
