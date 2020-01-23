@@ -38,6 +38,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
 import de.unkrig.commons.nullanalysis.NotNullByDefault;
 import de.unkrig.cscontrib.LocalTokenType;
+import de.unkrig.cscontrib.compat.Cs820;
 import de.unkrig.csdoclet.annotation.BooleanRuleProperty;
 import de.unkrig.csdoclet.annotation.Rule;
 
@@ -93,13 +94,13 @@ class WrapSwitchBlockStmtGroupCheck extends AbstractWrapCheck {
     visitToken(DetailAST ast) {
         assert ast != null;
 
-        if (ast.getParent().getType() != CASE_GROUP.delocalize()) return;
+        if (Cs820.getType(Cs820.getParent(ast)) != CASE_GROUP.delocalize()) return;
 
         // Single-line case group?
         if (
             this.allowOneLineSwitchBlockStmtGroup
             && AbstractWrapCheck.isSingleLine(ast)
-            && ast.getParent().getLineNo() == ast.getLineNo()
+            && Cs820.getLineNo(Cs820.getParent(ast)) == Cs820.getLineNo(ast)
         ) return;
 
         // SUPPRESS CHECKSTYLE WrapMethod:10

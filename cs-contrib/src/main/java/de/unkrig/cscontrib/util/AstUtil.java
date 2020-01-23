@@ -32,6 +32,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
 import de.unkrig.commons.nullanalysis.Nullable;
 import de.unkrig.cscontrib.LocalTokenType;
+import de.unkrig.cscontrib.compat.Cs820;
 
 /**
  * Utility methods related to CHECKSTYLE's DetailAST model.
@@ -47,7 +48,7 @@ class AstUtil {
      */
     public static boolean
     grandParentTypeIs(DetailAST ast, LocalTokenType... types) {
-        LocalTokenType grandparentType = LocalTokenType.localize(ast.getParent().getParent().getType());
+        LocalTokenType grandparentType = LocalTokenType.localize(Cs820.getType(Cs820.getParent(Cs820.getParent(ast))));
         for (LocalTokenType type : types) {
             if (grandparentType == type) return true;
         }
@@ -59,9 +60,9 @@ class AstUtil {
      */
     public static boolean
     parentTypeIs(DetailAST ast, LocalTokenType type) {
-        DetailAST parent = ast.getParent();
+        DetailAST parent = Cs820.getParent(ast);
 
-        return LocalTokenType.localize(parent.getType()) == type;
+        return LocalTokenType.localize(Cs820.getType(parent)) == type;
     }
 
     /**
@@ -69,9 +70,9 @@ class AstUtil {
      */
     public static boolean
     nextSiblingTypeIs(DetailAST ast, LocalTokenType type) {
-        DetailAST nextSibling = ast.getNextSibling();
+        DetailAST nextSibling = Cs820.getNextSibling(ast);
 
-        return nextSibling != null && LocalTokenType.localize(nextSibling.getType()) == type;
+        return nextSibling != null && LocalTokenType.localize(Cs820.getType(nextSibling)) == type;
     }
 
     /**
@@ -79,9 +80,9 @@ class AstUtil {
      */
     public static boolean
     firstChildTypeIs(DetailAST ast, LocalTokenType type) {
-        DetailAST firstChild = ast.getFirstChild();
+        DetailAST firstChild = Cs820.getFirstChild(ast);
 
-        return firstChild != null && LocalTokenType.localize(firstChild.getType()) == type;
+        return firstChild != null && LocalTokenType.localize(Cs820.getType(firstChild)) == type;
     }
 
     /**
@@ -89,9 +90,9 @@ class AstUtil {
      */
     public static boolean
     previousSiblingTypeIs(DetailAST ast, LocalTokenType type) {
-        DetailAST previousSibling = ast.getPreviousSibling();
+        DetailAST previousSibling = Cs820.getPreviousSibling(ast);
 
-        return previousSibling != null && LocalTokenType.localize(previousSibling.getType()) == type;
+        return previousSibling != null && LocalTokenType.localize(Cs820.getType(previousSibling)) == type;
     }
 
     /**
@@ -105,25 +106,25 @@ class AstUtil {
 
         final LocalTokenType type, parentType, grandParentType, previousSiblingType, nextSiblingType, firstChildType;
         {
-            type = LocalTokenType.localize(ast.getType());
-            DetailAST parent = ast.getParent();
+            type = LocalTokenType.localize(Cs820.getType(ast));
+            DetailAST parent = Cs820.getParent(ast);
             if (parent == null) {
                 parentType      = null;
                 grandParentType = null;
             } else {
-                parentType = LocalTokenType.localize(parent.getType());
-                DetailAST grandparent = parent.getParent();
-                grandParentType = grandparent == null ? null : LocalTokenType.localize(grandparent.getType());
+                parentType = LocalTokenType.localize(Cs820.getType(parent));
+                DetailAST grandparent = Cs820.getParent(parent);
+                grandParentType = grandparent == null ? null : LocalTokenType.localize(Cs820.getType(grandparent));
             }
 
-            DetailAST previousSibling = ast.getPreviousSibling();
-            previousSiblingType = previousSibling == null ? null : LocalTokenType.localize(previousSibling.getType());
+            DetailAST previousSibling = Cs820.getPreviousSibling(ast);
+            previousSiblingType = previousSibling == null ? null : LocalTokenType.localize(Cs820.getType(previousSibling));
 
-            DetailAST nextSibling = ast.getNextSibling();
-            nextSiblingType = nextSibling == null ? null : LocalTokenType.localize(nextSibling.getType());
+            DetailAST nextSibling = Cs820.getNextSibling(ast);
+            nextSiblingType = nextSibling == null ? null : LocalTokenType.localize(Cs820.getType(nextSibling));
 
-            DetailAST firstChild = ast.getFirstChild();
-            firstChildType = firstChild == null ? null : LocalTokenType.localize(firstChild.getType());
+            DetailAST firstChild = Cs820.getFirstChild(ast);
+            firstChildType = firstChild == null ? null : LocalTokenType.localize(Cs820.getType(firstChild));
         }
 
         // Find out how this token is to be checked.
@@ -370,7 +371,7 @@ class AstUtil {
             case ANNOTATION_MEMBER_VALUE_PAIR: return NAME__ANNO_MEMBER;
 
             case PARAMETER_DEF:
-                return ast.getPreviousSibling().getChildCount() == 0 ? NAME__INFERRED_PARAM : NAME__PARAM;
+                return Cs820.getChildCount(Cs820.getPreviousSibling(ast)) == 0 ? NAME__INFERRED_PARAM : NAME__PARAM;
 
             case CLASS_DEF:
             case INTERFACE_DEF:
@@ -384,7 +385,7 @@ class AstUtil {
                 }
 
                 if (AstUtil.getAncestorWithTypeNot(ast, LocalTokenType.DOT) == LocalTokenType.IMPORT) {
-                    return ast.getNextSibling() == null ? NAME__IMPORT_TYPE : NAME__IMPORT_COMPONENT;
+                    return Cs820.getNextSibling(ast) == null ? NAME__IMPORT_TYPE : NAME__IMPORT_COMPONENT;
                 }
 
                 {
@@ -491,7 +492,7 @@ class AstUtil {
                 return L_PAREN__METH_INVOCATION;
 
             case LITERAL_FOR:
-                return ast.getNextSibling().getFirstChild() == null ? L_PAREN__FOR_NO_INIT : L_PAREN__FOR;
+                return Cs820.getFirstChild(Cs820.getNextSibling(ast)) == null ? L_PAREN__FOR_NO_INIT : L_PAREN__FOR;
 
             case RESOURCE_SPECIFICATION:
                 return L_PAREN__RESOURCES;
@@ -520,10 +521,10 @@ class AstUtil {
             case LITERAL_SWITCH: return R_CURLY__SWITCH;
 
             case ANNOTATION_ARRAY_INIT:
-                return ast.getPreviousSibling() == null ? R_CURLY__EMPTY_ANNO_ARRAY_INIT : R_CURLY__ANNO_ARRAY_INIT;
+                return Cs820.getPreviousSibling(ast) == null ? R_CURLY__EMPTY_ANNO_ARRAY_INIT : R_CURLY__ANNO_ARRAY_INIT;
 
             case ARRAY_INIT:
-                return ast.getPreviousSibling() == null ? R_CURLY__EMPTY_ARRAY_INIT : R_CURLY__ARRAY_INIT;
+                return Cs820.getPreviousSibling(ast) == null ? R_CURLY__EMPTY_ARRAY_INIT : R_CURLY__ARRAY_INIT;
 
             case OBJBLOCK:
                 assert grandParentType != null;
@@ -568,16 +569,16 @@ class AstUtil {
 
                 case CTOR_DEF:
                 case METHOD_DEF:
-                    return ast.getPreviousSibling() == null ? R_CURLY__EMPTY_METH_DECL : R_CURLY__METH_DECL;
+                    return Cs820.getPreviousSibling(ast) == null ? R_CURLY__EMPTY_METH_DECL : R_CURLY__METH_DECL;
 
                 case ARRAY_INIT:
-                    return ast.getPreviousSibling() == null ? R_CURLY__EMPTY_ARRAY_INIT : R_CURLY__ARRAY_INIT;
+                    return Cs820.getPreviousSibling(ast) == null ? R_CURLY__EMPTY_ARRAY_INIT : R_CURLY__ARRAY_INIT;
 
                 case LITERAL_CATCH:
-                    return ast.getPreviousSibling() == null ? R_CURLY__EMPTY_CATCH : R_CURLY__CATCH;
+                    return Cs820.getPreviousSibling(ast) == null ? R_CURLY__EMPTY_CATCH : R_CURLY__CATCH;
 
                 case LAMBDA:
-                    return ast.getPreviousSibling() == null ? R_CURLY__EMPTY_LAMBDA : R_CURLY__LAMBDA;
+                    return Cs820.getPreviousSibling(ast) == null ? R_CURLY__EMPTY_LAMBDA : R_CURLY__LAMBDA;
 
                 default:
                     assert false : grandParentType;
@@ -610,7 +611,7 @@ class AstUtil {
                 return R_PAREN__METH_INVOCATION;
 
             case LITERAL_FOR:
-                return ast.getPreviousSibling().getFirstChild() == null ? R_PAREN__FOR_NO_UPDATE : R_PAREN__FOR;
+                return Cs820.getFirstChild(Cs820.getPreviousSibling(ast)) == null ? R_PAREN__FOR_NO_UPDATE : R_PAREN__FOR;
 
             case RESOURCE_SPECIFICATION:
                 return R_PAREN__RESOURCES;
@@ -649,23 +650,23 @@ class AstUtil {
             case LITERAL_FOR:
                 if (nextSiblingType == null) return SEMI__STATEMENT;
                 if (previousSiblingType == LocalTokenType.FOR_INIT) {
-                    return ast.getPreviousSibling().getFirstChild() == null ? (
-                        ast.getNextSibling().getFirstChild() == null
+                    return Cs820.getFirstChild(Cs820.getPreviousSibling(ast)) == null ? (
+                    		Cs820.getFirstChild(Cs820.getNextSibling(ast)) == null
                         ? SEMI__FOR_NO_INIT_NO_CONDITION
                         : SEMI__FOR_NO_INIT_CONDITION
                     ) : (
-                        ast.getNextSibling().getFirstChild() == null
+                    		Cs820.getFirstChild(Cs820.getNextSibling(ast)) == null
                         ? SEMI__FOR_INIT_NO_CONDITION
                         : SEMI__FOR_INIT_CONDITION
                     );
                 }
                 if (previousSiblingType == LocalTokenType.FOR_CONDITION) {
-                    return ast.getPreviousSibling().getFirstChild() == null ? (
-                        ast.getNextSibling().getFirstChild() == null
+                    return Cs820.getFirstChild(Cs820.getPreviousSibling(ast)) == null ? (
+                		Cs820.getFirstChild(Cs820.getNextSibling(ast)) == null
                         ? SEMI__FOR_NO_CONDITION_NO_UPDATE
                         : SEMI__FOR_NO_CONDITION_UPDATE
                     ) : (
-                        ast.getNextSibling().getFirstChild() == null
+                		Cs820.getFirstChild(Cs820.getNextSibling(ast)) == null
                         ? SEMI__FOR_CONDITION_NO_UPDATE
                         : SEMI__FOR_CONDITION_UPDATE
                     );
@@ -782,11 +783,11 @@ class AstUtil {
      */
     @Nullable private static LocalTokenType
     getAncestorWithTypeNot(DetailAST ast, LocalTokenType tokenType) {
-        for (DetailAST a = ast.getParent();; a = a.getParent()) {
+        for (DetailAST a = Cs820.getParent(ast);; a = Cs820.getParent(a)) {
 
             if (a == null) return null;
 
-            int t = a.getType();
+            int t = Cs820.getType(a);
             if (t != tokenType.delocalize()) return LocalTokenType.localize(t);
         }
     }
@@ -795,18 +796,18 @@ class AstUtil {
      */
     @Nullable private static LocalTokenType
     getAncestorWithTypeNot(DetailAST ast, LocalTokenType tokenType1, LocalTokenType tokenType2) {
-        for (DetailAST a = ast.getParent();; a = a.getParent()) {
+        for (DetailAST a = Cs820.getParent(ast);; a = Cs820.getParent(a)) {
 
             if (a == null) return null;
 
-            LocalTokenType t = LocalTokenType.localize(a.getType());
+            LocalTokenType t = LocalTokenType.localize(Cs820.getType(a));
             if (t != tokenType1 && t != tokenType2) return t;
         }
     }
 
     /** @return Whether the type of the {@code ast} equals the given {@code ltt} */
     public static boolean
-    typeIs(DetailAST ast, LocalTokenType ltt) { return LocalTokenType.localize(ast.getType()) == ltt; }
+    typeIs(DetailAST ast, LocalTokenType ltt) { return LocalTokenType.localize(Cs820.getType(ast)) == ltt; }
 
     /**
      * @return Whether the {@code ast} has a parent, and that has a preceeding sibling, and the type of that equals the
@@ -814,11 +815,11 @@ class AstUtil {
      */
     public static boolean
     previousUncleTypeIs(DetailAST ast, LocalTokenType ltt) {
-        DetailAST parent = ast.getParent();
+        DetailAST parent = Cs820.getParent(ast);
         if (parent != null) {
-            DetailAST previousUncle = parent.getPreviousSibling();
+            DetailAST previousUncle = Cs820.getPreviousSibling(parent);
             if (previousUncle != null) {
-                return LocalTokenType.localize(previousUncle.getType()) == ltt;
+                return LocalTokenType.localize(Cs820.getType(previousUncle)) == ltt;
             }
         }
         return false;
@@ -830,13 +831,13 @@ class AstUtil {
      */
     public static boolean
     grandGrandParentTypeIs(DetailAST ast, LocalTokenType ltt) {
-        DetailAST parent = ast.getParent();
+        DetailAST parent = Cs820.getParent(ast);
         if (parent != null) {
-            DetailAST grandParent = parent.getParent();
+            DetailAST grandParent = Cs820.getParent(parent);
             if (grandParent != null) {
-                DetailAST grandGrandParent = grandParent.getParent();
+                DetailAST grandGrandParent = Cs820.getParent(grandParent);
                 if (grandGrandParent != null) {
-                    return LocalTokenType.localize(grandGrandParent.getType()) == ltt;
+                    return LocalTokenType.localize(Cs820.getType(grandGrandParent)) == ltt;
                 }
             }
         }

@@ -33,6 +33,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
 import de.unkrig.commons.nullanalysis.NotNullByDefault;
 import de.unkrig.cscontrib.LocalTokenType;
+import de.unkrig.cscontrib.compat.Cs820;
 import de.unkrig.cscontrib.util.AstUtil;
 import de.unkrig.csdoclet.annotation.BooleanRuleProperty;
 import de.unkrig.csdoclet.annotation.Rule;
@@ -188,7 +189,7 @@ class WrapAnnotationCheck extends AbstractWrapCheck {
     visitToken(DetailAST ast) {
         assert ast != null;
 
-        switch (LocalTokenType.localize(ast.getType())) {
+        switch (LocalTokenType.localize(Cs820.getType(ast))) {
 
         case ANNOTATION_DEF:
             if (this.allowOneLineDecl && AbstractWrapCheck.isSingleLine(ast)) return;

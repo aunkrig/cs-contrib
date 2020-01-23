@@ -7,7 +7,7 @@
   
   <groupId>de.unkrig.checkstyle</groupId>
   <artifactId>cs-contrib</artifactId>
-  <version>1.0.3-SNAPSHOT</version>
+  <version>1.0.3</version>
 
   <name>de.unkrig.cs-contrib - Additional checks, filters and quickfixes for CheckStyle and Eclipse-CS</name>
   <description>
@@ -47,7 +47,7 @@
     <dependency>
       <groupId>com.puppycrawl.tools</groupId>
       <artifactId>checkstyle</artifactId>
-      <version>8.19</version>
+      <version>8.21</version>
     </dependency>
     <dependency>
       <groupId>de.unkrig.commons</groupId>

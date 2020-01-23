@@ -42,6 +42,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
 import de.unkrig.commons.nullanalysis.NotNullByDefault;
 import de.unkrig.cscontrib.LocalTokenType;
+import de.unkrig.cscontrib.compat.Cs820;
 import de.unkrig.csdoclet.annotation.Rule;
 import de.unkrig.csdoclet.annotation.SingleSelectRuleProperty;
 
@@ -104,7 +105,7 @@ class WrapLocalVariableCheck extends AbstractWrapCheck {
     visitToken(DetailAST ast) {
         assert ast != null;
 
-        if (ast.getParent().getType() != OBJBLOCK.delocalize()) {
+        if (Cs820.getType(Cs820.getParent(ast)) != OBJBLOCK.delocalize()) {
 
             // SUPPRESS CHECKSTYLE WrapMethod:6
             this.checkChildren(

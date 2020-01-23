@@ -40,6 +40,7 @@ import com.puppycrawl.tools.checkstyle.api.FullIdent;
 
 import de.unkrig.commons.nullanalysis.NotNullByDefault;
 import de.unkrig.cscontrib.LocalTokenType;
+import de.unkrig.cscontrib.compat.Cs820;
 import de.unkrig.cscontrib.util.AstUtil;
 import de.unkrig.csdoclet.annotation.Message;
 import de.unkrig.csdoclet.annotation.MultiCheckRuleProperty;
@@ -276,7 +277,7 @@ class NameSpelling extends AbstractCheck {
 
             // Determine the element type from the given AST.
             Elements element;
-            switch (LocalTokenType.localize(ast.getType())) {
+            switch (LocalTokenType.localize(Cs820.getType(ast))) {
 
             case ANNOTATION_DEF:
                 element = Elements.ANNOTATION;
@@ -333,9 +334,9 @@ class NameSpelling extends AbstractCheck {
                 break;
 
             default:
-                throw new IllegalStateException(Integer.toString(ast.getType()));
+                throw new IllegalStateException(Integer.toString(Cs820.getType(ast)));
             }
-            if (element == null) throw new IllegalStateException(Integer.toString(ast.getType()));
+            if (element == null) throw new IllegalStateException(Integer.toString(Cs820.getType(ast)));
 
             // Verify that this element should be checked.
             if (!this.elements.contains(element)) return;
@@ -358,13 +359,13 @@ class NameSpelling extends AbstractCheck {
             case LOCAL_VARIABLE:
             case METHOD:
             case TYPE_PARAMETER:
-                modifiersAst = ast.findFirstToken(LocalTokenType.MODIFIERS.delocalize());
-                nameAst      = ast.findFirstToken(LocalTokenType.IDENT.delocalize());
+                modifiersAst = Cs820.findFirstToken(ast, LocalTokenType.MODIFIERS.delocalize());
+                nameAst      = Cs820.findFirstToken(ast, LocalTokenType.IDENT.delocalize());
                 break;
 
             case PACKAGE:
                 modifiersAst = null;
-                nameAst      = ast.getLastChild().getPreviousSibling();
+                nameAst      = Cs820.getPreviousSibling(Cs820.getLastChild(ast));
                 break;
 
             default:
@@ -377,10 +378,10 @@ class NameSpelling extends AbstractCheck {
                 assert this.missingModifiers.isEmpty() : "Must not set 'missingModifiers' for element 'package'";
             } else {
                 for (LocalTokenType modifier : this.requiredModifiers) {
-                    if (modifiersAst.findFirstToken(modifier.delocalize()) == null) return;
+                    if (Cs820.findFirstToken(modifiersAst, modifier.delocalize()) == null) return;
                 }
                 for (LocalTokenType modifier : this.missingModifiers) {
-                    if (modifiersAst.findFirstToken(modifier.delocalize()) != null) return;
+                    if (Cs820.findFirstToken(modifiersAst, modifier.delocalize()) != null) return;
                 }
             }
 
@@ -416,7 +417,7 @@ class NameSpelling extends AbstractCheck {
             }
         } catch (RuntimeException rte) {
             throw new RuntimeException(
-                this.getFileContents().getFileName() + ":" + ast.getLineNo() + "x" + ast.getColumnNo(),
+                this.getFileContents().getFileName() + ":" + Cs820.getLineNo(ast) + "x" + Cs820.getColumnNo(ast),
                 rte
             );
         }

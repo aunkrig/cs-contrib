@@ -31,6 +31,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
 import de.unkrig.commons.nullanalysis.NotNullByDefault;
 import de.unkrig.cscontrib.LocalTokenType;
+import de.unkrig.cscontrib.compat.Cs820;
 import de.unkrig.cscontrib.util.AstUtil;
 import de.unkrig.csdoclet.annotation.Message;
 import de.unkrig.csdoclet.annotation.Rule;
@@ -111,11 +112,11 @@ class InnerAssignment extends AbstractCheck {
         ) return; // for (...; ...; a += b)
 
         // Parenthesized assignment?
-        if (ast.getPreviousSibling() != null && AstUtil.previousSiblingTypeIs(ast, LocalTokenType.LPAREN)) return;
+        if (Cs820.getPreviousSibling(ast) != null && AstUtil.previousSiblingTypeIs(ast, LocalTokenType.LPAREN)) return;
 
         // Annotation member-value pair?
         if (AstUtil.parentTypeIs(ast, LocalTokenType.ANNOTATION_MEMBER_VALUE_PAIR)) return;
 
-        this.log(ast.getLineNo(), ast.getColumnNo(), InnerAssignment.MESSAGE_KEY_MUST_PARENTHESIZE);
+        this.log(Cs820.getLineNo(ast), Cs820.getColumnNo(ast), InnerAssignment.MESSAGE_KEY_MUST_PARENTHESIZE);
     }
 }

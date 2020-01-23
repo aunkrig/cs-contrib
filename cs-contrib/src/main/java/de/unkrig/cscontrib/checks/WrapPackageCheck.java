@@ -33,6 +33,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
 import de.unkrig.commons.nullanalysis.NotNullByDefault;
 import de.unkrig.cscontrib.LocalTokenType;
+import de.unkrig.cscontrib.compat.Cs820;
 import de.unkrig.csdoclet.annotation.Rule;
 import de.unkrig.csdoclet.annotation.SingleSelectRuleProperty;
 
@@ -115,21 +116,21 @@ class WrapPackageCheck extends AbstractWrapCheck {
         //        ;                      [1x22]  [3x22]
         //    import                     [3x0]   [5x0]
 
-        this.checkSameLine(ast, AbstractWrapCheck.getLeftmostDescendant(ast.getFirstChild().getNextSibling()));
+        this.checkSameLine(ast, AbstractWrapCheck.getLeftmostDescendant(Cs820.getNextSibling(Cs820.getFirstChild(ast))));
 
-        if (ast.getFirstChild().getFirstChild() == null) return; // No annotation(s)
+        if (Cs820.getFirstChild(Cs820.getFirstChild(ast)) == null) return; // No annotation(s)
 
         if (this.wrapDeclBeforePackage == NO_WRAP) {
-            this.checkSameLine(ast, ast.getFirstChild().getFirstChild().getFirstChild());
+            this.checkSameLine(ast, Cs820.getFirstChild(Cs820.getFirstChild(Cs820.getFirstChild(ast))));
             return;
         }
 
         if (this.wrapDeclBeforePackage == MAY_WRAP && AbstractWrapCheck.isSingleLine(ast)) return;
 
         // Check that "@" is vertically aligned with the "package" keyword.
-        this.checkWrapped(ast.getFirstChild().getFirstChild().getFirstChild(), ast);
+        this.checkWrapped(Cs820.getFirstChild(Cs820.getFirstChild(Cs820.getFirstChild(ast))), ast);
 
         // Check that the "package" keyword appears in the same line as the terminal ";".
-        this.checkSameLine(ast, ast.getFirstChild().getNextSibling().getNextSibling());
+        this.checkSameLine(ast, Cs820.getNextSibling(Cs820.getNextSibling(Cs820.getFirstChild(ast))));
     }
 }

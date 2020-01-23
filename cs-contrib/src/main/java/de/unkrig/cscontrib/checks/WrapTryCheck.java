@@ -49,6 +49,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
 import de.unkrig.commons.nullanalysis.NotNullByDefault;
 import de.unkrig.cscontrib.LocalTokenType;
+import de.unkrig.cscontrib.compat.Cs820;
 import de.unkrig.csdoclet.annotation.Rule;
 import de.unkrig.csdoclet.annotation.SingleSelectRuleProperty;
 
@@ -173,7 +174,7 @@ class WrapTryCheck extends AbstractWrapCheck {
     visitToken(DetailAST ast) {
         assert ast != null;
 
-        switch (LocalTokenType.localize(ast.getType())) {
+        switch (LocalTokenType.localize(Cs820.getType(ast))) {
 
         //  TRY -> ...
         //   v
@@ -200,7 +201,7 @@ class WrapTryCheck extends AbstractWrapCheck {
             break;
 
         default:
-            throw new IllegalStateException(Integer.toString(ast.getType()));
+            throw new IllegalStateException(Integer.toString(Cs820.getType(ast)));
         }
     }
 }

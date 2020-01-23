@@ -37,6 +37,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
 import de.unkrig.commons.nullanalysis.NotNullByDefault;
 import de.unkrig.cscontrib.LocalTokenType;
+import de.unkrig.cscontrib.compat.Cs820;
 import de.unkrig.csdoclet.annotation.Rule;
 import de.unkrig.csdoclet.annotation.SingleSelectRuleProperty;
 
@@ -120,13 +121,13 @@ class WrapBinaryOperatorCheck extends AbstractWrapCheck {
     visitToken(DetailAST ast) {
         assert ast != null;
 
-        DetailAST child = ast.getFirstChild();
-        if (child.getType() == LPAREN.delocalize()) {
+        DetailAST child = Cs820.getFirstChild(ast);
+        if (Cs820.getType(child) == LPAREN.delocalize()) {
             child = this.checkParenthesizedExpression(child, false);
             assert child == null;
         } else {
             boolean inline;
-            switch (LocalTokenType.localize(ast.getParent().getType())) {
+            switch (LocalTokenType.localize(Cs820.getType(Cs820.getParent(ast)))) {
 
             case INDEX_OP:                     // a[#]
             case ANNOTATION:                   // @SuppressWarnings(#)
@@ -153,20 +154,20 @@ class WrapBinaryOperatorCheck extends AbstractWrapCheck {
             case LITERAL_SWITCH:       // switch (#)
             case LITERAL_SYNCHRONIZED: // synchronized (#)
             case LITERAL_WHILE:        // while (#)
-                inline = ast.getParent().getLineNo() == ast.getLineNo();
+                inline = Cs820.getLineNo(Cs820.getParent(ast)) == Cs820.getLineNo(ast);
                 break;
 
             case ELIST:                // meth(#, #, #)
-                inline = ast.getParent().getChildCount() != 1;
+                inline = Cs820.getChildCount(Cs820.getParent(ast)) != 1;
                 break;
 
             default:
                 assert false : (
                     this.getFileContents().getFileName()
                     + ":"
-                    + ast.getLineNo()
+                    + Cs820.getLineNo(ast)
                     + ": EXPR has unexpected parent "
-                    + LocalTokenType.localize(ast.getParent().getType())
+                    + LocalTokenType.localize(Cs820.getType(Cs820.getParent(ast)))
                 );
                 inline = false;
                 break;
@@ -181,39 +182,39 @@ class WrapBinaryOperatorCheck extends AbstractWrapCheck {
     private DetailAST
     checkParenthesizedExpression(DetailAST previous, boolean inline) {
 
-        if (previous.getType() != LPAREN.delocalize()) {
+        if (Cs820.getType(previous) != LPAREN.delocalize()) {
             this.checkExpression(previous, inline);
-            return previous.getNextSibling();
+            return Cs820.getNextSibling(previous);
         }
 
         @SuppressWarnings("unused") AstDumper dumper = new AstDumper(previous); // For debugging
 
-        DetailAST next = previous.getNextSibling();
+        DetailAST next = Cs820.getNextSibling(previous);
         for (;;) {
-            if (next.getType() != LPAREN.delocalize()) {
+            if (Cs820.getType(next) != LPAREN.delocalize()) {
                 break;
             }
             this.checkSameLine(previous, next);
             previous = next;
-            next     = next.getNextSibling();
+            next     = Cs820.getNextSibling(next);
         }
 
-        if (previous.getLineNo() == AbstractWrapCheck.getLeftmostDescendant(next).getLineNo()) {
+        if (Cs820.getLineNo(previous) == Cs820.getLineNo(AbstractWrapCheck.getLeftmostDescendant(next))) {
             this.checkExpression(next, true);
             previous = next;
-            next     = next.getNextSibling();
+            next     = Cs820.getNextSibling(next);
             this.checkSameLine(AbstractWrapCheck.getRightmostDescendant(previous), next);
         } else {
             this.checkIndented(previous, AbstractWrapCheck.getLeftmostDescendant(next));
             this.checkExpression(next, false);
             previous = next;
-            next     = next.getNextSibling();
+            next     = Cs820.getNextSibling(next);
             this.checkUnindented(AbstractWrapCheck.getRightmostDescendant(previous), next);
         }
 
         previous = next;
-        assert next.getType() == RPAREN.delocalize();
-        return next.getNextSibling();
+        assert Cs820.getType(next) == RPAREN.delocalize();
+        return Cs820.getNextSibling(next);
     }
 
     /**
@@ -222,17 +223,17 @@ class WrapBinaryOperatorCheck extends AbstractWrapCheck {
     private void
     checkExpression(DetailAST expression, boolean inline) {
 
-        if (expression.getType() == QUESTION.delocalize()) {
+        if (Cs820.getType(expression) == QUESTION.delocalize()) {
             System.currentTimeMillis();
         }
-        switch (LocalTokenType.localize(expression.getType())) {
+        switch (LocalTokenType.localize(Cs820.getType(expression))) {
 
         case QUESTION: // Ternary operation.
             {
-                DetailAST c = this.checkParenthesizedExpression(expression.getFirstChild(), inline);
+                DetailAST c = this.checkParenthesizedExpression(Cs820.getFirstChild(expression), inline);
                 c = this.checkParenthesizedExpression(c, inline);
-                assert c.getType() == COLON.delocalize();
-                c = c.getNextSibling();
+                assert Cs820.getType(c) == COLON.delocalize();
+                c = Cs820.getNextSibling(c);
                 c = this.checkParenthesizedExpression(c, inline);
                 assert c == null;
             }
@@ -240,13 +241,13 @@ class WrapBinaryOperatorCheck extends AbstractWrapCheck {
 
         case INDEX_OP:
             {
-                DetailAST c = this.checkParenthesizedExpression(expression.getFirstChild(), inline);
+                DetailAST c = this.checkParenthesizedExpression(Cs820.getFirstChild(expression), inline);
                 assert c != null;
-                this.checkSameLine(AbstractWrapCheck.getRightmostDescendant(expression.getFirstChild()), expression);
+                this.checkSameLine(AbstractWrapCheck.getRightmostDescendant(Cs820.getFirstChild(expression)), expression);
                 this.checkSameLine(expression, AbstractWrapCheck.getLeftmostDescendant(c));
                 c = this.checkParenthesizedExpression(c, inline);
                 assert c != null;
-                assert c.getType() == RBRACK.delocalize();
+                assert Cs820.getType(c) == RBRACK.delocalize();
                 this.checkSameLine(expression, c);
             }
             break;
@@ -286,25 +287,25 @@ class WrapBinaryOperatorCheck extends AbstractWrapCheck {
         case STAR:
         case STAR_ASSIGN:
             {
-                DetailAST c = this.checkParenthesizedExpression(expression.getFirstChild(), inline);
-                if (c != null && c.getType() == TYPE_ARGUMENTS.delocalize()) {
+                DetailAST c = this.checkParenthesizedExpression(Cs820.getFirstChild(expression), inline);
+                if (c != null && Cs820.getType(c) == TYPE_ARGUMENTS.delocalize()) {
 
                     // TYPE_ARGUMENTS checked by "visitToken()".
                     ;
-                    c = c.getNextSibling();
+                    c = Cs820.getNextSibling(c);
                 }
                 assert c != null : (
                     this.getFileContents().getFileName()
                     + ":"
-                    + expression.getLineNo()
+                    + Cs820.getLineNo(expression)
                     + ": Second operand for '"
-                    + LocalTokenType.localize(expression.getType())
+                    + LocalTokenType.localize(Cs820.getType(expression))
                     + "' missing"
                 );
 
                 // Check wrapping and alignment of LHS and operator.
                 {
-                    DetailAST lhs = AbstractWrapCheck.getRightmostDescendant(c.getPreviousSibling());
+                    DetailAST lhs = AbstractWrapCheck.getRightmostDescendant(Cs820.getPreviousSibling(c));
                     switch (inline ? Control.NO_WRAP : this.wrapBeforeOperator) {
 
                     case NO_WRAP:
@@ -312,9 +313,9 @@ class WrapBinaryOperatorCheck extends AbstractWrapCheck {
                         break;
 
                     case MAY_WRAP:
-                        if (lhs.getLineNo() != expression.getLineNo()) {
+                        if (Cs820.getLineNo(lhs) != Cs820.getLineNo(expression)) {
                             this.checkWrapped(
-                                AbstractWrapCheck.getLeftmostDescendant(expression.getFirstChild()),
+                                AbstractWrapCheck.getLeftmostDescendant(Cs820.getFirstChild(expression)),
                                 expression
                             );
                         } else {
@@ -323,17 +324,17 @@ class WrapBinaryOperatorCheck extends AbstractWrapCheck {
                         break;
 
                     case MUST_WRAP:
-                        this.checkWrapped(lhs, AbstractWrapCheck.getLeftmostDescendant(expression.getFirstChild()));
-                        if (lhs.getLineNo() == expression.getLineNo()) {
+                        this.checkWrapped(lhs, AbstractWrapCheck.getLeftmostDescendant(Cs820.getFirstChild(expression)));
+                        if (Cs820.getLineNo(lhs) == Cs820.getLineNo(expression)) {
                             this.log(
                                 expression,
                                 AbstractWrapCheck.MESSAGE_KEY_MUST_WRAP,
-                                lhs.getText(),
-                                expression.getText()
+                                Cs820.getText(lhs),
+                                Cs820.getText(expression)
                             );
                         } else {
                             this.checkWrapped(
-                                AbstractWrapCheck.getLeftmostDescendant(expression.getFirstChild()),
+                                AbstractWrapCheck.getLeftmostDescendant(Cs820.getFirstChild(expression)),
                                 expression
                             );
                         }
@@ -354,23 +355,23 @@ class WrapBinaryOperatorCheck extends AbstractWrapCheck {
                         break;
 
                     case MAY_WRAP:
-                        if (expression.getLineNo() != rhs.getLineNo()) {
-                            this.checkWrapped(AbstractWrapCheck.getLeftmostDescendant(expression.getFirstChild()), rhs);
+                        if (Cs820.getLineNo(expression) != Cs820.getLineNo(rhs)) {
+                            this.checkWrapped(AbstractWrapCheck.getLeftmostDescendant(Cs820.getFirstChild(expression)), rhs);
                         } else {
                             this.checkSameLine(expression, rhs);
                         }
                         break;
 
                     case MUST_WRAP:
-                        if (expression.getLineNo() == rhs.getLineNo()) {
+                        if (Cs820.getLineNo(expression) == Cs820.getLineNo(rhs)) {
                             this.log(
                                 rhs,
                                 AbstractWrapCheck.MESSAGE_KEY_MUST_WRAP,
-                                expression.getText(),
-                                rhs.getText()
+                                Cs820.getText(expression),
+                                Cs820.getText(rhs)
                             );
                         } else {
-                            this.checkWrapped(AbstractWrapCheck.getLeftmostDescendant(expression.getFirstChild()), rhs);
+                            this.checkWrapped(AbstractWrapCheck.getLeftmostDescendant(Cs820.getFirstChild(expression)), rhs);
                         }
                         break;
 
@@ -383,13 +384,13 @@ class WrapBinaryOperatorCheck extends AbstractWrapCheck {
                 assert c == null : (
                     this.getFileContents().getFileName()
                     + ":"
-                    + expression.getLineNo()
+                    + Cs820.getLineNo(expression)
                     + ": Unexpected third operand "
-                    + LocalTokenType.localize(c.getType())
+                    + LocalTokenType.localize(Cs820.getType(c))
                     + "/'"
-                    + c.getText()
+                    + Cs820.getText(c)
                     + "' for '"
-                    + LocalTokenType.localize(expression.getType())
+                    + LocalTokenType.localize(Cs820.getType(expression))
                     + "'"
                 );
             }
@@ -406,15 +407,15 @@ class WrapBinaryOperatorCheck extends AbstractWrapCheck {
         case UNARY_MINUS:
         case UNARY_PLUS:
             {
-                DetailAST c = this.checkParenthesizedExpression(expression.getFirstChild(), inline);
+                DetailAST c = this.checkParenthesizedExpression(Cs820.getFirstChild(expression), inline);
                 assert c == null;
             }
             break;
 
         case ARRAY_DECLARATOR:
             {
-                DetailAST c = this.checkParenthesizedExpression(expression.getFirstChild(), inline);
-                assert c.getType() == RBRACK.delocalize();
+                DetailAST c = this.checkParenthesizedExpression(Cs820.getFirstChild(expression), inline);
+                assert Cs820.getType(c) == RBRACK.delocalize();
             }
             break;
 
@@ -441,8 +442,8 @@ class WrapBinaryOperatorCheck extends AbstractWrapCheck {
         case LITERAL_DOUBLE:
         case LITERAL_VOID:
             {
-                DetailAST c = expression.getFirstChild();
-                assert c == null : Integer.toString(expression.getChildCount());
+                DetailAST c = Cs820.getFirstChild(expression);
+                assert c == null : Integer.toString(Cs820.getChildCount(expression));
             }
             break;
 
@@ -451,20 +452,20 @@ class WrapBinaryOperatorCheck extends AbstractWrapCheck {
 
         case METHOD_CALL:
             {
-                DetailAST method = expression.getFirstChild(); // Everything up to and including the method name.
+                DetailAST method = Cs820.getFirstChild(expression); // Everything up to and including the method name.
                 this.checkExpression(method, inline);
                 this.checkSameLine(method, expression);
 
-                DetailAST arguments = method.getNextSibling();
-                DetailAST rparen    = arguments.getNextSibling();
+                DetailAST arguments = Cs820.getNextSibling(method);
+                DetailAST rparen    = Cs820.getNextSibling(arguments);
 
-                assert rparen.getType() == RPAREN.delocalize();
-                assert rparen.getNextSibling() == null;
+                assert Cs820.getType(rparen) == RPAREN.delocalize();
+                assert Cs820.getNextSibling(rparen) == null;
 
-                DetailAST firstArgument = arguments.getFirstChild();
+                DetailAST firstArgument = Cs820.getFirstChild(arguments);
                 if (
                     firstArgument == null
-                    || AbstractWrapCheck.getLeftmostDescendant(firstArgument).getLineNo() == expression.getLineNo()
+                    || Cs820.getLineNo(AbstractWrapCheck.getLeftmostDescendant(firstArgument)) == Cs820.getLineNo(expression)
                 ) {
                     this.checkSameLine(AbstractWrapCheck.getRightmostDescendant(arguments), rparen);
                 } else {
@@ -484,7 +485,7 @@ class WrapBinaryOperatorCheck extends AbstractWrapCheck {
         default:
             this.log(
                 expression,
-                "Uncheckable: " + LocalTokenType.localize(expression.getType()) + " / " + expression.toString()
+                "Uncheckable: " + LocalTokenType.localize(Cs820.getType(expression)) + " / " + expression.toString()
             );
         }
     }

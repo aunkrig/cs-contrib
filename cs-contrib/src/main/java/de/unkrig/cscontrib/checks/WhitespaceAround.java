@@ -31,6 +31,7 @@ import com.puppycrawl.tools.checkstyle.checks.whitespace.WhitespaceAroundCheck;
 
 import de.unkrig.commons.nullanalysis.NotNullByDefault;
 import de.unkrig.cscontrib.LocalTokenType;
+import de.unkrig.cscontrib.compat.Cs820;
 import de.unkrig.cscontrib.util.AstUtil;
 import de.unkrig.csdoclet.annotation.BooleanRuleProperty;
 import de.unkrig.csdoclet.annotation.MultiCheckRuleProperty;
@@ -142,7 +143,7 @@ class WhitespaceAround extends WhitespaceAroundCheck {
 
     @Override public void
     visitToken(DetailAST ast) {
-        switch (LocalTokenType.localize(ast.getType())) {
+        switch (LocalTokenType.localize(Cs820.getType(ast))) {
 
         case LCURLY:
 

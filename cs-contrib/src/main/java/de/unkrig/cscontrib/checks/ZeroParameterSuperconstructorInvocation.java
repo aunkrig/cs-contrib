@@ -31,6 +31,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
 import de.unkrig.commons.nullanalysis.NotNullByDefault;
 import de.unkrig.cscontrib.LocalTokenType;
+import de.unkrig.cscontrib.compat.Cs820;
 import de.unkrig.csdoclet.annotation.Message;
 import de.unkrig.csdoclet.annotation.Rule;
 
@@ -73,21 +74,21 @@ class ZeroParameterSuperconstructorInvocation extends AbstractCheck {
         @SuppressWarnings("unused") AstDumper dumper = new AstDumper(ast);
 
         // Find the constructor body.
-        DetailAST statementList = ast.findFirstToken(LocalTokenType.SLIST.delocalize());
+        DetailAST statementList = Cs820.findFirstToken(ast, LocalTokenType.SLIST.delocalize());
 
         // Find the superconstructor call.
-        DetailAST superconstructorCall = statementList.findFirstToken(LocalTokenType.SUPER_CTOR_CALL.delocalize());
+        DetailAST superconstructorCall = Cs820.findFirstToken(statementList, LocalTokenType.SUPER_CTOR_CALL.delocalize());
         if (superconstructorCall == null) return;
 
         // Check whether this is a qualified SUPER call.
-        DetailAST lparen = superconstructorCall.getFirstChild();
-        if (lparen.getType() != LocalTokenType.LPAREN.delocalize()) return;
+        DetailAST lparen = Cs820.getFirstChild(superconstructorCall);
+        if (Cs820.getType(lparen) != LocalTokenType.LPAREN.delocalize()) return;
 
         // Find the argument list.
-        DetailAST arguments = lparen.getNextSibling();
+        DetailAST arguments = Cs820.getNextSibling(lparen);
 
         // Determine the argument count.
-        int argumentCount = arguments.getChildCount(LocalTokenType.EXPR.delocalize());
+        int argumentCount = Cs820.getChildCount(arguments, LocalTokenType.EXPR.delocalize());
 
         // Complain about redundant zero-parameter superconstructor invocation.
         if (argumentCount == 0) {

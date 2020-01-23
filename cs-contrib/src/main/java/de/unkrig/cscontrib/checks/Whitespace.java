@@ -34,6 +34,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
 import de.unkrig.commons.nullanalysis.NotNullByDefault;
 import de.unkrig.cscontrib.LocalTokenType;
+import de.unkrig.cscontrib.compat.Cs820;
 import de.unkrig.cscontrib.util.AstUtil;
 import de.unkrig.cscontrib.util.JavaElement;
 import de.unkrig.csdoclet.annotation.Message;
@@ -193,34 +194,34 @@ class Whitespace extends AbstractCheck {
             && !mustNotBeWhitespaceAfter
         ) return;
 
-        final String line = this.getLines()[ast.getLineNo() - 1];
+        final String line = this.getLines()[Cs820.getLineNo(ast) - 1];
 
         // Check whitespace BEFORE token.
         if (mustBeWhitespaceBefore || mustNotBeWhitespaceBefore) {
-            int before = ast.getColumnNo() - 1;
+            int before = Cs820.getColumnNo(ast) - 1;
 
             if (before > 0 && !Whitespace.LINE_PREFIX.matcher(line).region(0, before).matches()) {
                 boolean isWhitespace = Character.isWhitespace(line.charAt(before));
                 if (mustBeWhitespaceBefore && !isWhitespace) {
-                    this.log(ast, Whitespace.MESSAGE_KEY_NOT_PRECEDED, ast.getText(), javaElement);
+                    this.log(ast, Whitespace.MESSAGE_KEY_NOT_PRECEDED, Cs820.getText(ast), javaElement);
                 } else
                 if (mustNotBeWhitespaceBefore && isWhitespace) {
-                    this.log(ast, Whitespace.MESSAGE_KEY_PRECEDED, ast.getText(), javaElement);
+                    this.log(ast, Whitespace.MESSAGE_KEY_PRECEDED, Cs820.getText(ast), javaElement);
                 }
             }
         }
 
         // Check whitespace AFTER token.
         if (mustBeWhitespaceAfter || mustNotBeWhitespaceAfter) {
-            int after = ast.getColumnNo() + ast.getText().length();
+            int after = Cs820.getColumnNo(ast) + Cs820.getText(ast).length();
 
             if (after < line.length() && !Whitespace.LINE_SUFFIX.matcher(line).region(after, line.length()).matches()) {
                 boolean isWhitespace = Character.isWhitespace(line.charAt(after));
                 if (mustBeWhitespaceAfter && !isWhitespace) {
-                    this.log(ast.getLineNo(), after, Whitespace.MESSAGE_KEY_NOT_FOLLOWED, ast.getText(), javaElement);
+                    this.log(Cs820.getLineNo(ast), after, Whitespace.MESSAGE_KEY_NOT_FOLLOWED, Cs820.getText(ast), javaElement);
                 } else
                 if (mustNotBeWhitespaceAfter && isWhitespace) {
-                    this.log(ast.getLineNo(), after, Whitespace.MESSAGE_KEY_FOLLOWED, ast.getText(), javaElement);
+                    this.log(Cs820.getLineNo(ast), after, Whitespace.MESSAGE_KEY_FOLLOWED, Cs820.getText(ast), javaElement);
                 }
             }
         }

@@ -40,6 +40,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
 import de.unkrig.commons.nullanalysis.NotNullByDefault;
 import de.unkrig.cscontrib.LocalTokenType;
+import de.unkrig.cscontrib.compat.Cs820;
 import de.unkrig.csdoclet.annotation.IntegerRuleProperty;
 import de.unkrig.csdoclet.annotation.Message;
 
@@ -291,8 +292,8 @@ class AbstractWrapCheck extends AbstractCheck {
     protected static boolean
     isSingleLine(DetailAST ast) {
         return (
-            AbstractWrapCheck.getLeftmostDescendant(ast).getLineNo()
-            == AbstractWrapCheck.getRightmostDescendant(ast).getLineNo()
+            Cs820.getLineNo(AbstractWrapCheck.getLeftmostDescendant(ast))
+            == Cs820.getLineNo(AbstractWrapCheck.getRightmostDescendant(ast))
         );
     }
 
@@ -302,12 +303,12 @@ class AbstractWrapCheck extends AbstractCheck {
     protected static DetailAST
     getLeftmostDescendant(DetailAST ast) {
         for (;;) {
-            DetailAST tmp = ast.getFirstChild();
-            if (tmp == null && ast.getType() == MODIFIERS.delocalize()) tmp = ast.getNextSibling();
+            DetailAST tmp = Cs820.getFirstChild(ast);
+            if (tmp == null && Cs820.getType(ast) == MODIFIERS.delocalize()) tmp = Cs820.getNextSibling(ast);
             if (
                 tmp == null
-                || tmp.getLineNo() > ast.getLineNo()
-                || (tmp.getLineNo() == ast.getLineNo() && tmp.getColumnNo() > ast.getColumnNo())
+                || Cs820.getLineNo(tmp) > Cs820.getLineNo(ast)
+                || (Cs820.getLineNo(tmp) == Cs820.getLineNo(ast) && Cs820.getColumnNo(tmp) > Cs820.getColumnNo(ast))
             ) return ast;
             ast = tmp;
         }
@@ -319,11 +320,11 @@ class AbstractWrapCheck extends AbstractCheck {
     protected static DetailAST
     getRightmostDescendant(DetailAST ast) {
         for (;;) {
-            DetailAST tmp = ast.getLastChild();
+            DetailAST tmp = Cs820.getLastChild(ast);
             if (
                 tmp == null
-                || tmp.getLineNo() < ast.getLineNo()
-                || (tmp.getLineNo() == ast.getLineNo() && tmp.getColumnNo() < ast.getColumnNo())
+                || Cs820.getLineNo(tmp) < Cs820.getLineNo(ast)
+                || (Cs820.getLineNo(tmp) == Cs820.getLineNo(ast) && Cs820.getColumnNo(tmp) < Cs820.getColumnNo(ast))
             ) return ast;
             ast = tmp;
         }
@@ -339,23 +340,23 @@ class AbstractWrapCheck extends AbstractCheck {
 
         @SuppressWarnings("unused") AstDumper astDumper = new AstDumper(ast); // For debugging
 
-        DetailAST child = ast.getFirstChild();
+        DetailAST child = Cs820.getFirstChild(ast);
 
         // Determine the "indentation parent".
-        switch (LocalTokenType.localize(ast.getType())) {
+        switch (LocalTokenType.localize(Cs820.getType(ast))) {
 
         case ELIST:      // There's an ELIST between the METH_CALL ('(') and the argument EXPRs.
-            ast = ast.getParent();
+            ast = Cs820.getParent(ast);
             break;
 
         case SLIST:
-            if (ast.getParent().getType() == CASE_GROUP.delocalize()) {
-                ast = ast.getParent().getParent();
+            if (Cs820.getType(Cs820.getParent(ast)) == CASE_GROUP.delocalize()) {
+                ast = Cs820.getParent(Cs820.getParent(ast));
             }
             break;
 
         case PARAMETERS:
-            ast = ast.getPreviousSibling(); // Use the LPAREN, not the PARAMETERS.
+            ast = Cs820.getPreviousSibling(ast); // Use the LPAREN, not the PARAMETERS.
             break;
 
         case DOT:
@@ -378,7 +379,7 @@ class AbstractWrapCheck extends AbstractCheck {
 
                 case END:
                     if (child == null) return;
-                    this.log(child, "Unexpected extra token ''{0}''", child.getText());
+                    this.log(child, "Unexpected extra token ''{0}''", Cs820.getText(child));
                     return;
 
                 case OPTIONAL:
@@ -386,10 +387,10 @@ class AbstractWrapCheck extends AbstractCheck {
                     while (AbstractWrapCheck.SKIPPABLES.contains(tokenType)) tokenType = args[idx++];
                     if (
                         child != null
-                        && (tokenType == ANY || tokenType == LocalTokenType.localize(child.getType()))
+                        && (tokenType == ANY || tokenType == LocalTokenType.localize(Cs820.getType(child)))
                     ) {
                         previousAst = child;
-                        child       = child.getNextSibling();
+                        child       = Cs820.getNextSibling(child);
                     }
                     break;
 
@@ -423,7 +424,7 @@ class AbstractWrapCheck extends AbstractCheck {
                                 break DO_BRANCH;
                             } else
                             if (da instanceof LocalTokenType) {
-                                doBranch = child != null && ((LocalTokenType) da).delocalize() == child.getType();
+                                doBranch = child != null && ((LocalTokenType) da).delocalize() == Cs820.getType(child);
                                 break DO_BRANCH;
                             } else
                             {
@@ -437,7 +438,7 @@ class AbstractWrapCheck extends AbstractCheck {
                                         break DO_BRANCH;
                                     } else
                                     if (na instanceof LocalTokenType) {
-                                        doBranch = child == null || ((LocalTokenType) na).delocalize() != child.getType(); // SUPPRESS CHECKSTYLE LineLength
+                                        doBranch = child == null || ((LocalTokenType) na).delocalize() != Cs820.getType(child); // SUPPRESS CHECKSTYLE LineLength
                                         break DO_BRANCH;
                                     } else
                                     if (na == ANY) {
@@ -498,18 +499,18 @@ class AbstractWrapCheck extends AbstractCheck {
                         this.log(
                             previousAst,
                             "Token missing after ''{0}''",
-                            previousAst.getText()
+                            Cs820.getText(previousAst)
                         );
                         return;
                     }
 
                     previousAst = AbstractWrapCheck.getRightmostDescendant(child);
-                    child       = child.getNextSibling();
+                    child       = Cs820.getNextSibling(child);
                     break;
 
                 case INDENT_IF_CHILDREN:
                     assert child != null;
-                    if (child.getFirstChild() == null) break;
+                    if (Cs820.getFirstChild(child) == null) break;
                     /*FALLTHROUGH*/
 
                 case MAY_INDENT:
@@ -519,11 +520,11 @@ class AbstractWrapCheck extends AbstractCheck {
                     case 0:
                         {
                             DetailAST c = AbstractWrapCheck.getLeftmostDescendant(child);
-                            if (c.getLineNo() == previousAst.getLineNo()) {
+                            if (Cs820.getLineNo(c) == Cs820.getLineNo(previousAst)) {
                                 mode = 1;
                             } else {
                                 mode = 2;
-                                if (child.getType() == CASE_GROUP.delocalize()) {
+                                if (Cs820.getType(child) == CASE_GROUP.delocalize()) {
                                     this.checkWrapped(ast, c);
                                 } else {
                                     this.checkIndented(ast, c);
@@ -539,18 +540,18 @@ class AbstractWrapCheck extends AbstractCheck {
                     case 2:
                         {
                             DetailAST l = AbstractWrapCheck.getLeftmostDescendant(child);
-                            if (l.getLineNo() == previousAst.getLineNo()) {
+                            if (Cs820.getLineNo(l) == Cs820.getLineNo(previousAst)) {
 
                                 if (!this.checkMultipleElementsPerLine(child)) {
                                     this.log(
                                         l,
                                         AbstractWrapCheck.MESSAGE_KEY_MUST_WRAP,
-                                        previousAst.getText(),
-                                        l.getText()
+                                        Cs820.getText(previousAst),
+                                        Cs820.getText(l)
                                     );
                                 }
                             } else {
-                                if (child.getType() == CASE_GROUP.delocalize()) {
+                                if (Cs820.getType(child) == CASE_GROUP.delocalize()) {
                                     this.checkWrapped(ast, l);
                                 } else {
                                     this.checkIndented(ast, l);
@@ -566,7 +567,7 @@ class AbstractWrapCheck extends AbstractCheck {
                     switch (mode) {
 
                     case 0:
-                        if (previousAst.getLineNo() != child.getLineNo()) {
+                        if (Cs820.getLineNo(previousAst) != Cs820.getLineNo(child)) {
                             this.checkWrapped(ast, child);
                         }
                         break;
@@ -585,14 +586,14 @@ class AbstractWrapCheck extends AbstractCheck {
                 case MAY_WRAP:
                     assert child != null;
                     assert mode == 0;
-                    if (child.getLineNo() != previousAst.getLineNo()) {
+                    if (Cs820.getLineNo(child) != Cs820.getLineNo(previousAst)) {
                         this.checkWrapped(previousAst, child);
                     }
                     break;
 
                 case MUST_WRAP:
                     assert mode == 0;
-                    if (previousAst.getType() == MODIFIERS.delocalize()) {
+                    if (Cs820.getType(previousAst) == MODIFIERS.delocalize()) {
                         ;
                     } else
                     {
@@ -612,24 +613,24 @@ class AbstractWrapCheck extends AbstractCheck {
                         previousAst,
                         "''{0}'' after ''{1}''",
                         tokenType,
-                        previousAst.getText()
+                        Cs820.getText(previousAst)
                     );
                     return;
                 }
 
-                if (child.getType() != ((LocalTokenType) tokenType).delocalize()) {
+                if (Cs820.getType(child) != ((LocalTokenType) tokenType).delocalize()) {
                     this.log(
                         child,
                         "Expected ''{0}'' instead of ''{1}''",
                         tokenType,
-                        child.getText() + "'"
+                        Cs820.getText(child) + "'"
                     );
                     return;
                 }
 
                 assert child != null;
                 previousAst = AbstractWrapCheck.getRightmostDescendant(child);
-                child       = child.getNextSibling();
+                child       = Cs820.getNextSibling(child);
             } else
             {
                 throw new AssertionError(tokenType);
@@ -665,8 +666,8 @@ class AbstractWrapCheck extends AbstractCheck {
      */
     protected void
     checkIndented(DetailAST previous, DetailAST next) {
-        if (next.getLineNo() == previous.getLineNo()) {
-            this.log(next, AbstractWrapCheck.MESSAGE_KEY_MUST_WRAP, previous.getText(), next.getText());
+        if (Cs820.getLineNo(next) == Cs820.getLineNo(previous)) {
+            this.log(next, AbstractWrapCheck.MESSAGE_KEY_MUST_WRAP, Cs820.getText(previous), Cs820.getText(next));
         } else {
             this.checkAlignment(next, this.calculateIndentation(previous) + this.basicOffset);
         }
@@ -678,8 +679,8 @@ class AbstractWrapCheck extends AbstractCheck {
      */
     protected void
     checkUnindented(DetailAST previous, DetailAST next) {
-        if (next.getLineNo() == previous.getLineNo()) {
-            this.log(next, AbstractWrapCheck.MESSAGE_KEY_MUST_WRAP, previous.getText(), next.getText());
+        if (Cs820.getLineNo(next) == Cs820.getLineNo(previous)) {
+            this.log(next, AbstractWrapCheck.MESSAGE_KEY_MUST_WRAP, Cs820.getText(previous), Cs820.getText(next));
         } else {
             this.checkAlignment(next, this.calculateIndentation(previous) - this.basicOffset);
         }
@@ -690,8 +691,8 @@ class AbstractWrapCheck extends AbstractCheck {
      */
     protected void
     checkWrapped(DetailAST previous, DetailAST next) {
-        if (next.getLineNo() == previous.getLineNo()) {
-            this.log(next, AbstractWrapCheck.MESSAGE_KEY_MUST_WRAP, previous.getText(), next.getText());
+        if (Cs820.getLineNo(next) == Cs820.getLineNo(previous)) {
+            this.log(next, AbstractWrapCheck.MESSAGE_KEY_MUST_WRAP, Cs820.getText(previous), Cs820.getText(next));
         } else {
             this.checkAlignment(next, this.calculateIndentation(previous));
         }
@@ -702,12 +703,12 @@ class AbstractWrapCheck extends AbstractCheck {
      */
     protected void
     checkSameLine(DetailAST left, DetailAST right) {
-        if (left.getLineNo() != right.getLineNo()) {
+        if (Cs820.getLineNo(left) != Cs820.getLineNo(right)) {
             this.log(
                 right,
                 AbstractWrapCheck.MESSAGE_KEY_MUST_JOIN,
-                right.getText(),
-                left.getText()
+                Cs820.getText(right),
+                Cs820.getText(left)
             );
         }
     }
@@ -720,15 +721,15 @@ class AbstractWrapCheck extends AbstractCheck {
     private void
     checkAlignment(DetailAST ast, int targetColumnNo) {
         int actualColumnNo = AbstractWrapCheck.lengthExpandedTabs(
-            this.getLines()[ast.getLineNo() - 1],
-            ast.getColumnNo(),
+            this.getLines()[Cs820.getLineNo(ast) - 1],
+            Cs820.getColumnNo(ast),
             this.getTabWidth()
         );
         if (actualColumnNo != targetColumnNo) {
             this.log(
                 ast,
                 AbstractWrapCheck.MESSAGE_KEY_WRONG_COLUMN,
-                ast.getText(),
+                Cs820.getText(ast),
                 targetColumnNo + 1,
                 actualColumnNo + 1
             );
@@ -763,7 +764,7 @@ class AbstractWrapCheck extends AbstractCheck {
      */
     private int
     calculateIndentation(DetailAST ast) {
-        String line = this.getLines()[ast.getLineNo() - 1];
+        String line = this.getLines()[Cs820.getLineNo(ast) - 1];
 
         int result = 0;
         for (int i = 0; i < line.length(); ++i) {

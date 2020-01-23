@@ -34,6 +34,7 @@ import com.puppycrawl.tools.checkstyle.checks.whitespace.PadOption;
 import com.puppycrawl.tools.checkstyle.checks.whitespace.ParenPadCheck;
 
 import de.unkrig.commons.nullanalysis.NotNullByDefault;
+import de.unkrig.cscontrib.compat.Cs820;
 import de.unkrig.csdoclet.annotation.Message;
 import de.unkrig.csdoclet.annotation.Rule;
 import de.unkrig.csdoclet.annotation.SingleSelectRuleProperty;
@@ -96,20 +97,20 @@ class ParenPad extends ParenPadCheck {
 
     @Override protected void
     processLeft(DetailAST ast) {
-        final String line  = this.getLines()[ast.getLineNo() - 1];
-        final int    after = ast.getColumnNo() + 1;
+        final String line  = this.getLines()[Cs820.getLineNo(ast) - 1];
+        final int    after = Cs820.getColumnNo(ast) + 1;
 
         String rest = line.substring(after);
         if (
             this.option == PadOption.NOSPACE
             && !ParenPad.NOSPACE_PATTERN.matcher(rest).matches()
         ) {
-            this.log(ast.getLineNo(), after, ParenPad.MESSAGE_KEY_FOLLOWED_BY_WHITESPACE, "(");
+            this.log(Cs820.getLineNo(ast), after, ParenPad.MESSAGE_KEY_FOLLOWED_BY_WHITESPACE, "(");
         } else if (
             this.option == PadOption.SPACE
             && !ParenPad.SPACE_PATTERN.matcher(rest).matches()
         ) {
-            this.log(ast.getLineNo(), after, ParenPad.MESSAGE_KEY_NOT_FOLLOWED_BY_WHITESPACE, "(");
+            this.log(Cs820.getLineNo(ast), after, ParenPad.MESSAGE_KEY_NOT_FOLLOWED_BY_WHITESPACE, "(");
         }
     }
 }

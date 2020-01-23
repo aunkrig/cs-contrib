@@ -39,6 +39,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
 import de.unkrig.commons.nullanalysis.NotNullByDefault;
 import de.unkrig.cscontrib.LocalTokenType;
+import de.unkrig.cscontrib.compat.Cs820;
 import de.unkrig.cscontrib.util.AstUtil;
 import de.unkrig.csdoclet.annotation.BooleanRuleProperty;
 import de.unkrig.csdoclet.annotation.Rule;
@@ -134,7 +135,7 @@ class WrapArrayInitCheck extends AbstractWrapCheck {
     visitToken(DetailAST ast) {
         assert ast != null;
 
-        switch (LocalTokenType.localize(ast.getType())) {
+        switch (LocalTokenType.localize(Cs820.getType(ast))) {
 
         case LITERAL_NEW:
             // SUPPRESS CHECKSTYLE WrapMethod:6
@@ -148,7 +149,7 @@ class WrapArrayInitCheck extends AbstractWrapCheck {
             break;
 
         case ASSIGN:
-            if (ast.getChildCount() == 1) {
+            if (Cs820.getChildCount(ast) == 1) {
 
                 // A field or local variable initialization.
                 // SUPPRESS CHECKSTYLE WrapMethod:6

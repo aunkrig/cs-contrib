@@ -31,6 +31,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
 import de.unkrig.commons.nullanalysis.NotNullByDefault;
 import de.unkrig.cscontrib.LocalTokenType;
+import de.unkrig.cscontrib.compat.Cs820;
 import de.unkrig.cscontrib.util.AstUtil;
 import de.unkrig.csdoclet.annotation.BooleanRuleProperty;
 import de.unkrig.csdoclet.annotation.Message;
@@ -232,7 +233,7 @@ class Alignment extends AbstractCheck {
 
         @SuppressWarnings("unused") AstDumper ad = new AstDumper(ast);
 
-        switch (LocalTokenType.localize(ast.getType())) {
+        switch (LocalTokenType.localize(Cs820.getType(ast))) {
 
         case VARIABLE_DEF:
             if (
@@ -295,8 +296,8 @@ class Alignment extends AbstractCheck {
 
         case EXPR:
             if (this.applyToAssignments && AstUtil.parentTypeIs(ast, LocalTokenType.SLIST)) {
-                DetailAST      ass   = ast.getFirstChild();
-                LocalTokenType fcltt = LocalTokenType.localize(ass.getType());
+                DetailAST      ass   = Cs820.getFirstChild(ast);
+                LocalTokenType fcltt = LocalTokenType.localize(Cs820.getType(ass));
                 if (
                     fcltt == LocalTokenType.ASSIGN
                     || fcltt == LocalTokenType.PLUS_ASSIGN
@@ -326,14 +327,14 @@ class Alignment extends AbstractCheck {
     checkCaseGroupAlignment(DetailAST previous, DetailAST current) {
         if (previous == null) return;
 
-        DetailAST caseOrDefault = current.getFirstChild();
-        DetailAST slist         = caseOrDefault.getNextSibling();
-        if (LocalTokenType.localize(slist.getType()) != LocalTokenType.SLIST) return;
-        if (slist.getChildCount() == 0) return;
+        DetailAST caseOrDefault = Cs820.getFirstChild(current);
+        DetailAST slist         = Cs820.getNextSibling(caseOrDefault);
+        if (LocalTokenType.localize(Cs820.getType(slist)) != LocalTokenType.SLIST) return;
+        if (Cs820.getChildCount(slist) == 0) return;
 
         this.checkTokenAlignment(
-            Alignment.getLeftmostDescendant(previous.getFirstChild().getNextSibling()),
-            Alignment.getLeftmostDescendant(slist.getFirstChild())
+            Alignment.getLeftmostDescendant(Cs820.getNextSibling(Cs820.getFirstChild(previous))),
+            Alignment.getLeftmostDescendant(Cs820.getFirstChild(slist))
         );
     }
 
@@ -361,24 +362,24 @@ class Alignment extends AbstractCheck {
     ) {
         if (previousDeclaration == null) return;
 
-        if (currentDeclaration.getParent() != previousDeclaration.getParent()) return;
+        if (Cs820.getParent(currentDeclaration) != Cs820.getParent(previousDeclaration)) return;
 
         // Apply alignment check only to first declarator of a declaration, e.g. "int a = 3, b = 7".
-        if (previousDeclaration.getLineNo() == currentDeclaration.getLineNo()) return;
+        if (Cs820.getLineNo(previousDeclaration) == Cs820.getLineNo(currentDeclaration)) return;
 
         // Check vertical alignment of names.
         if (applyToName) {
             this.checkTokenAlignment(
-                previousDeclaration.findFirstToken(LocalTokenType.IDENT.delocalize()),
-                currentDeclaration.findFirstToken(LocalTokenType.IDENT.delocalize())
+        		Cs820.findFirstToken(previousDeclaration, LocalTokenType.IDENT.delocalize()),
+        		Cs820.findFirstToken(currentDeclaration, LocalTokenType.IDENT.delocalize())
             );
         }
 
         // Check vertical alignment of initializers.
         if (applyToInitializer) {
             this.checkTokenAlignment(
-                previousDeclaration.findFirstToken(LocalTokenType.ASSIGN.delocalize()),
-                currentDeclaration.findFirstToken(LocalTokenType.ASSIGN.delocalize())
+        		Cs820.findFirstToken(previousDeclaration, LocalTokenType.ASSIGN.delocalize()),
+        		Cs820.findFirstToken(currentDeclaration, LocalTokenType.ASSIGN.delocalize())
             );
         }
     }
@@ -399,23 +400,23 @@ class Alignment extends AbstractCheck {
         // Check vertical alignment of names.
         if (this.applyToMethodName) {
             this.checkTokenAlignment(
-                previousDefinition.findFirstToken(LocalTokenType.IDENT.delocalize()),
-                currentDefinition.findFirstToken(LocalTokenType.IDENT.delocalize())
+        		Cs820.findFirstToken(previousDefinition, LocalTokenType.IDENT.delocalize()),
+        		Cs820.findFirstToken(currentDefinition, LocalTokenType.IDENT.delocalize())
             );
         }
 
         // Check vertical alignment of initializers.
         if (this.applyToMethodBody) {
 
-            DetailAST previousBody = previousDefinition.findFirstToken(LocalTokenType.SLIST.delocalize());
-            DetailAST currentBody  = currentDefinition.findFirstToken(LocalTokenType.SLIST.delocalize());
+            DetailAST previousBody = Cs820.findFirstToken(previousDefinition, LocalTokenType.SLIST.delocalize());
+            DetailAST currentBody  = Cs820.findFirstToken(currentDefinition, LocalTokenType.SLIST.delocalize());
 
             // Check alignment of opening brace.
             this.checkTokenAlignment(previousBody, currentBody);
 
             // Check alignment of closing brace.
             if (previousBody != null && currentBody != null) {
-                this.checkTokenAlignment(previousBody.getLastChild(), currentBody.getLastChild());
+                this.checkTokenAlignment(Cs820.getLastChild(previousBody), Cs820.getLastChild(currentBody));
             }
         }
     }
@@ -425,8 +426,8 @@ class Alignment extends AbstractCheck {
         if (previousToken == null || currentToken == null) return;
 
         if (
-            previousToken.getLineNo() + 1 == currentToken.getLineNo()
-            && previousToken.getColumnNo() != currentToken.getColumnNo()
+        		Cs820.getLineNo(previousToken) + 1 == Cs820.getLineNo(currentToken)
+            && Cs820.getColumnNo(previousToken) != Cs820.getColumnNo(currentToken)
         ) {
 
             // The name in the current declaration is not vertically aligned with the name in the declaration in the
@@ -434,9 +435,9 @@ class Alignment extends AbstractCheck {
             this.log(
                 currentToken,
                 Alignment.MESSAGE_KEY_MISALIGNED,
-                currentToken.getText(),
-                previousToken.getText(),
-                previousToken.getLineNo()
+                Cs820.getText(currentToken),
+                Cs820.getText(previousToken),
+                Cs820.getLineNo(previousToken)
             );
         }
     }
@@ -444,16 +445,16 @@ class Alignment extends AbstractCheck {
     getLeftmostDescendant(DetailAST ast) {
         for (;;) {
 
-            DetailAST tmp = ast.getFirstChild();
+            DetailAST tmp = Cs820.getFirstChild(ast);
             if (
                 tmp == null
-                && LocalTokenType.localize(ast.getType()) == LocalTokenType.MODIFIERS
-            ) tmp = ast.getNextSibling();
+                && LocalTokenType.localize(Cs820.getType(ast)) == LocalTokenType.MODIFIERS
+            ) tmp = Cs820.getNextSibling(ast);
 
             if (
                 tmp == null
-                || tmp.getLineNo() > ast.getLineNo()
-                || (tmp.getLineNo() == ast.getLineNo() && tmp.getColumnNo() > ast.getColumnNo())
+                || Cs820.getLineNo(tmp) > Cs820.getLineNo(ast)
+                || (Cs820.getLineNo(tmp) == Cs820.getLineNo(ast) && Cs820.getColumnNo(tmp) > Cs820.getColumnNo(ast))
             ) return ast;
 
             ast = tmp;
@@ -463,11 +464,11 @@ class Alignment extends AbstractCheck {
 //    private static DetailAST
 //    getRightmostDescendant(DetailAST ast) {
 //        for (;;) {
-//            DetailAST tmp = ast.getLastChild();
+//            DetailAST tmp = Cs820.getLastChild(ast);
 //            if (
 //                tmp == null
-//                || tmp.getLineNo() < ast.getLineNo()
-//                || (tmp.getLineNo() == ast.getLineNo() && tmp.getColumnNo() < ast.getColumnNo())
+//                || Cs820.getLineNo(tmp) < Cs820.getLineNo(ast)
+//                || Cs820.getLineNo(tmp) == Cs820.getLineNo(ast) && Cs820.getColumnNo(tmp) < Cs820.getColumnNo(ast))
 //            ) return ast;
 //            ast = tmp;
 //        }

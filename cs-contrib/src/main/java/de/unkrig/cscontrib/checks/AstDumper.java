@@ -30,6 +30,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
 import de.unkrig.commons.nullanalysis.Nullable;
 import de.unkrig.cscontrib.LocalTokenType;
+import de.unkrig.cscontrib.compat.Cs820;
 
 /**
  * A helper with a zero-cost constructor for dumping an AST.
@@ -52,10 +53,10 @@ class AstDumper {
 
     private static void
     dumpSiblings(String prefix, @Nullable DetailAST sibling, StringBuilder sb) {
-        for (; sibling != null; sibling = sibling.getNextSibling()) {
-            String tokenName = LocalTokenType.localize(sibling.getType()).toString();
+        for (; sibling != null; sibling = Cs820.getNextSibling(sibling)) {
+            String tokenName = LocalTokenType.localize(Cs820.getType(sibling)).toString();
             sb.append(prefix).append(sibling).append(tokenName).append('\n');
-            AstDumper.dumpSiblings(prefix + "  ", sibling.getFirstChild(), sb);
+            AstDumper.dumpSiblings(prefix + "  ", Cs820.getFirstChild(sibling), sb);
         }
     }
 }

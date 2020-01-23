@@ -40,6 +40,7 @@ import com.puppycrawl.tools.checkstyle.api.TextBlock;
 
 import de.unkrig.commons.nullanalysis.NotNullByDefault;
 import de.unkrig.cscontrib.LocalTokenType;
+import de.unkrig.cscontrib.compat.Cs820;
 import de.unkrig.cscontrib.util.AstUtil;
 import de.unkrig.csdoclet.annotation.Message;
 import de.unkrig.csdoclet.annotation.Rule;
@@ -286,7 +287,7 @@ class CppCommentAlignment extends AbstractCheck {
 
         @SuppressWarnings("unused") AstDumper astDumper = new AstDumper(ast);
 
-        if (ast.getChildCount() <= 1) return;
+        if (Cs820.getChildCount(ast) <= 1) return;
 
         List<DetailAST> children = this.getChildren(ast);
 
@@ -296,7 +297,7 @@ class CppCommentAlignment extends AbstractCheck {
         int prevLineNo = Integer.MAX_VALUE; // SUPPRESS CHECKSTYLE UsageDistance
         for (DetailAST child : children) {
 
-            final int lineNo = child.getLineNo();
+            final int lineNo = Cs820.getLineNo(child);
 
             // Special case "CASE_GROUP { 'case' 'case' SLIST }".
             if (AstUtil.typeIs(child, LocalTokenType.SLIST)) continue;
@@ -375,8 +376,8 @@ class CppCommentAlignment extends AbstractCheck {
     getChildren(DetailAST ast) {
 
         {
-            DetailAST parent = ast.getParent();
-            if (parent != null && parent.getText().equals(ast.getText())) return Collections.emptyList();
+            DetailAST parent = Cs820.getParent(ast);
+            if (parent != null && Cs820.getText(parent).equals(Cs820.getText(ast))) return Collections.emptyList();
         }
 
         List<DetailAST> result = new ArrayList<DetailAST>();
@@ -387,18 +388,18 @@ class CppCommentAlignment extends AbstractCheck {
     private void
     getChildren2(DetailAST ast, List<DetailAST> result) {
 
-        for (DetailAST child = ast.getFirstChild(); child != null; child = child.getNextSibling()) {
+        for (DetailAST child = Cs820.getFirstChild(ast); child != null; child = Cs820.getNextSibling(child)) {
 
-            if (LocalTokenType.localize(child.getType()) == LocalTokenType.LPAREN) {
+            if (LocalTokenType.localize(Cs820.getType(child)) == LocalTokenType.LPAREN) {
                 result.add(child);
                 for (
-                    child = child.getNextSibling();
-                    LocalTokenType.localize(child.getType()) != LocalTokenType.RPAREN;
-                    child = child.getNextSibling()
+                    child = Cs820.getNextSibling(child);
+                    LocalTokenType.localize(Cs820.getType(child)) != LocalTokenType.RPAREN;
+                    child = Cs820.getNextSibling(child)
                 );
             }
 
-            if (child.getText().equals(ast.getText())) {
+            if (Cs820.getText(child).equals(Cs820.getText(ast))) {
                 this.getChildren2(child, result);
                 continue;
             }

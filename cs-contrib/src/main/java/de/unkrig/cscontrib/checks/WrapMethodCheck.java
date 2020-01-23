@@ -33,6 +33,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
 import de.unkrig.commons.nullanalysis.NotNullByDefault;
 import de.unkrig.cscontrib.LocalTokenType;
+import de.unkrig.cscontrib.compat.Cs820;
 import de.unkrig.cscontrib.util.AstUtil;
 import de.unkrig.csdoclet.annotation.BooleanRuleProperty;
 import de.unkrig.csdoclet.annotation.Rule;
@@ -162,7 +163,7 @@ class WrapMethodCheck extends AbstractWrapCheck {
 
         @SuppressWarnings("unused") AstDumper astDumper = new AstDumper(ast);
 
-        switch (LocalTokenType.localize(ast.getType())) {
+        switch (LocalTokenType.localize(Cs820.getType(ast))) {
 
         case METHOD_DEF:
             if (this.allowOneLineDecl && AbstractWrapCheck.isSingleLine(ast)) return;
@@ -203,7 +204,7 @@ class WrapMethodCheck extends AbstractWrapCheck {
             break;
 
         default:
-            throw new IllegalArgumentException(Integer.toString(ast.getType()));
+            throw new IllegalArgumentException(Integer.toString(Cs820.getType(ast)));
         }
     }
 
