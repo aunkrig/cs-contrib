@@ -31,7 +31,7 @@ import java.lang.reflect.Method;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
 /**
- * Declares proxy methods for the DetailAST" interface.
+ * Declares proxy methods for the "DetailAST" interface.
  * <p>
  *   <b>Background:</b>
  * </p>
