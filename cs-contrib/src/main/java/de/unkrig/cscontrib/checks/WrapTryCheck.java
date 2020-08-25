@@ -185,7 +185,7 @@ class WrapTryCheck extends AbstractWrapCheck {
                 ast,
                 FORK1,
                 this.wrapBeforeResourceSpecification, LocalTokenType.RESOURCE_SPECIFICATION,
-                LABEL1, this.wrapBeforeBody, SLIST, FORK3,
+                LABEL1, this.wrapBeforeBody, SLIST, FORK3, FORK4,
                 LABEL2, this.wrapBeforeCatch, LITERAL_CATCH, FORK2, FORK4,
                 LABEL3, this.wrapBeforeFinally, LITERAL_FINALLY,
                 LABEL4, END
