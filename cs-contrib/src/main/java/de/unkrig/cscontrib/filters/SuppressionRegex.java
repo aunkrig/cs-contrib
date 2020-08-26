@@ -29,6 +29,7 @@ package de.unkrig.cscontrib.filters;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -40,9 +41,11 @@ import com.puppycrawl.tools.checkstyle.api.Filter;
 import de.unkrig.commons.nullanalysis.NotNullByDefault;
 import de.unkrig.csdoclet.annotation.RegexRuleProperty;
 import de.unkrig.csdoclet.annotation.Rule;
+import de.unkrig.csdoclet.annotation.StringRuleProperty;
 
 /**
- * Specific events (i.e&#46; CheckStyle warnings) are suppressed in lines that match a given regex.
+ * Specific events (i.e&#46; CheckStyle warnings) are suppressed in lines that match a given regex, and optionally in
+ * a given number of lines following.
  */
 @Rule(
     group       = "%Filters.group",
@@ -56,7 +59,7 @@ class SuppressionRegex extends AutomaticBean implements Filter {
 
     private Pattern lineRegex;
 
-    /** The pattern against which the check name is matched. */
+    /** The check name to suppress. */
     private Pattern checkNameRegex;
 
     /** The message format to suppress. */
@@ -64,6 +67,9 @@ class SuppressionRegex extends AutomaticBean implements Filter {
 
     /** The module id format to suppress. */
     private Pattern moduleIdRegex;
+
+    /** The number of lines below for which the filter is also effective. */
+    private String influence = "0";
 
     /**
      * References the current FileContents for this filter. Since this is a weak reference to the FileContents, the
@@ -91,7 +97,7 @@ class SuppressionRegex extends AutomaticBean implements Filter {
     }
 
     /**
-     * Check name pattern to suppress.
+     * Check name pattern to suppress (e.g. "LineLength|Alignment").
      */
     @RegexRuleProperty
     public void
@@ -129,6 +135,15 @@ class SuppressionRegex extends AutomaticBean implements Filter {
         } catch (final PatternSyntaxException e) {
             throw new IllegalArgumentException("unable to parse " + moduleIdFormat, e);
         }
+    }
+
+    /**
+     * Number of lines after the suppression line for which it is effective.
+     */
+    @StringRuleProperty
+    public void
+    setInfluence(String influence) {
+        this.influence = influence;
     }
 
     // END CONFIGURATION SETTERS
@@ -178,26 +193,112 @@ class SuppressionRegex extends AutomaticBean implements Filter {
             this.setFileContents(currentContents);
         }
 
-        String line = currentContents.get(event.getLine() - 1);
-        if (this.lineRegex.matcher(line).find()) {
+        for (int lineNumber = event.getLine(); lineNumber >= 1 && lineNumber >= event.getLine() - 100; lineNumber--) {
+            String line = currentContents.get(lineNumber - 1);
+            Matcher m = this.lineRegex.matcher(line);
 
-            if (
-                SuppressionRegex.this.checkNameRegex != null
-                && this.checkNameRegex.matcher(event.getSourceName()).find()
-            ) return false;
+            if (m.find()) {
 
-            if (
-                SuppressionRegex.this.messageRegex != null
-                && this.moduleIdRegex.matcher(event.getMessage()).find()
-            ) return false;
+                // "this.influence" can be an integer string (e.g. "11"), or comprise replacement variables (e.g.
+                // "$2").
+                int inf;
+                try {
+                    inf = Integer.parseInt(expandSubsequenceReferences(this.influence, m));
+                } catch (NumberFormatException nfe) {
+                    inf = 0;
+                }
 
-            if (
-                SuppressionRegex.this.moduleIdRegex != null
-                && this.moduleIdRegex.matcher(event.getModuleId()).find()
-            ) return false;
+                // Check that the event line is in the "influence range" of the suppression line.
+                if (event.getLine() > lineNumber + inf) continue;
+
+                if (this.checkNameRegex != null && matcher(this.checkNameRegex, m, event.getSourceName()).find()) {
+                    return false;
+                }
+
+                if (this.messageRegex != null && matcher(this.messageRegex, m, event.getMessage()).find()) {
+                    return false;
+                }
+
+                if (this.moduleIdRegex != null && matcher(this.moduleIdRegex, m, event.getModuleId()).find()) {
+                    return false;
+                }
+            }
         }
 
         return true;
+    }
+
+    /**
+     * Same as {pattern.matcher(subject).find()}, except that iff the <var>pattern</var> contains captured subsequence
+     * references, then these are first expanded from the <var>capturedSubsequences</var> and then the
+     * <var>pattern</var> is re-compiled before it is applied.
+     */
+    private boolean
+    find(Pattern pattern, Matcher capturedSubsequences, String subject) {
+        return matcher(pattern, capturedSubsequences, subject).find();
+    }
+
+    /**
+     * Same as {pattern.matcher(subject)}, except that iff the <var>pattern</var> contains  captured subsequence
+     * references, then these are first expanded from the <var>capturedSubsequences</var> and then the
+     * <var>pattern</var> is re-compiled before it is applied.
+     */
+    private Matcher
+    matcher(Pattern pattern, Matcher capturedSubsequences, String subject) {
+        String regex = pattern.pattern();
+        String regex2 = expandSubsequenceReferences(regex, capturedSubsequences);
+        if (!regex2.equals(regex)) {
+            pattern = Pattern.compile(regex2);
+        }
+        Matcher m2 = pattern.matcher(subject);
+        return m2;
+    }
+
+    /**
+     * Returns the <var>subject</var>, with all "captured subsequence references" ({@code $1}, {@ode $2}, ...)
+     * replaced with captured subsequences of the <var>matcher</var>.
+     * Similar to {@link Matcher#appendReplacement(StringBuffer, String)}, but does not replace escaped characters
+     * (e.g. "\\") with the unescaped, except "\$".
+     * Precisely; a dollar-digit sequence is only replaced if it is preceeded with an even number of backslashes
+     * (including zero backslashes).
+     */
+    private static String
+    expandSubsequenceReferences(String subject, Matcher capturedSubsequences) {
+
+        int state = 0;
+        for (int i = 0; i < subject.length(); i++) {
+            char c = subject.charAt(i);
+            switch (state) {
+            case 0:                         // '\\'*
+                if (c == '\\') {            // '\\'* '\'
+                    state = 1;
+                } else
+                if (c == '$') {             // '\\'* '$'
+                    state = 2;
+                }
+                break;
+            case 1:                         // '\\'* '\' any-char
+                state = 0;
+                break;
+            case 2:
+                if (c == '\\') {            // '\\'* '$\'
+                    state = 1;
+                } else
+                if (Character.isDigit(c)) { // '\\'* '$' digit
+                    int groupNumber = Character.digit(c, 10);
+                    if (groupNumber <= capturedSubsequences.groupCount()) {
+                        String capturedSubsequence = capturedSubsequences.group(groupNumber);
+                        subject = subject.substring(0, i - 1) + capturedSubsequence + subject.substring(i + 1);
+                        i += capturedSubsequence.length() - 2;
+                    }
+                    state = 0;
+                } else
+                {                           // '\\'* '$' non-digit
+                    state = 0;
+                }
+            }
+        }
+        return subject;
     }
 
     @Override protected void
