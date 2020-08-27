@@ -7,7 +7,7 @@
   
   <groupId>de.unkrig.checkstyle</groupId>
   <artifactId>cs-contrib</artifactId>
-  <version>1.0.4</version>
+  <version>1.0.5-SNAPSHOT</version>
 
   <name>de.unkrig.cs-contrib - Additional checks, filters and quickfixes for CheckStyle and Eclipse-CS</name>
   <description>
