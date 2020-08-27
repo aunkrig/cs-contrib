@@ -167,7 +167,7 @@ class Whitespace extends AbstractCheck {
     }
 
     @Override public void
-    visitToken(DetailAST ast) {
+    visitToken(final DetailAST ast) {
         assert ast != null;
 
         @SuppressWarnings("unused") AstDumper dumper = new AstDumper(ast); // For debugging
@@ -196,6 +196,9 @@ class Whitespace extends AbstractCheck {
 
         final String line = this.getLines()[Cs820.getLineNo(ast) - 1];
 
+        String tokenText = Cs820.getText(ast);
+        if ("STATIC_INIT".contentEquals(tokenText)) tokenText = "static"; // Compensate one hack in the JavaRecognizer...
+
         // Check whitespace BEFORE token.
         if (mustBeWhitespaceBefore || mustNotBeWhitespaceBefore) {
             int before = Cs820.getColumnNo(ast) - 1;
@@ -203,25 +206,25 @@ class Whitespace extends AbstractCheck {
             if (before > 0 && !Whitespace.LINE_PREFIX.matcher(line).region(0, before).matches()) {
                 boolean isWhitespace = Character.isWhitespace(line.charAt(before));
                 if (mustBeWhitespaceBefore && !isWhitespace) {
-                    this.log(ast, Whitespace.MESSAGE_KEY_NOT_PRECEDED, Cs820.getText(ast), javaElement);
+                    this.log(ast, Whitespace.MESSAGE_KEY_NOT_PRECEDED, tokenText, javaElement);
                 } else
                 if (mustNotBeWhitespaceBefore && isWhitespace) {
-                    this.log(ast, Whitespace.MESSAGE_KEY_PRECEDED, Cs820.getText(ast), javaElement);
+                    this.log(ast, Whitespace.MESSAGE_KEY_PRECEDED, tokenText, javaElement);
                 }
             }
         }
 
         // Check whitespace AFTER token.
         if (mustBeWhitespaceAfter || mustNotBeWhitespaceAfter) {
-            int after = Cs820.getColumnNo(ast) + Cs820.getText(ast).length();
+            int after = Cs820.getColumnNo(ast) + tokenText.length();
 
             if (after < line.length() && !Whitespace.LINE_SUFFIX.matcher(line).region(after, line.length()).matches()) {
                 boolean isWhitespace = Character.isWhitespace(line.charAt(after));
                 if (mustBeWhitespaceAfter && !isWhitespace) {
-                    this.log(Cs820.getLineNo(ast), after, Whitespace.MESSAGE_KEY_NOT_FOLLOWED, Cs820.getText(ast), javaElement);
+                    this.log(Cs820.getLineNo(ast), after, Whitespace.MESSAGE_KEY_NOT_FOLLOWED, tokenText, javaElement);
                 } else
                 if (mustNotBeWhitespaceAfter && isWhitespace) {
-                    this.log(Cs820.getLineNo(ast), after, Whitespace.MESSAGE_KEY_FOLLOWED, Cs820.getText(ast), javaElement);
+                    this.log(Cs820.getLineNo(ast), after, Whitespace.MESSAGE_KEY_FOLLOWED, tokenText, javaElement);
                 }
             }
         }
