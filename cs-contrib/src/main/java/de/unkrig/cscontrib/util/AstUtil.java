@@ -245,7 +245,7 @@ class AstUtil {
             return parentType == LocalTokenType.VARIABLE_DEF ? ASSIGN__VAR_DECL : ASSIGN__ASSIGNMENT;
 
         case AT:
-            assert parentType != null;
+        	if (parentType == null) return null;
             switch (parentType) {
 
             case ANNOTATION:     return AT__ANNO;
@@ -255,7 +255,7 @@ class AstUtil {
             break;
 
         case COLON:
-            assert parentType != null;
+        	if (parentType == null) return null;
             switch (parentType) {
 
             case LITERAL_DEFAULT: return COLON__DEFAULT;
@@ -281,7 +281,7 @@ class AstUtil {
             return DOT__SELECTOR;
 
         case GENERIC_END:
-            assert parentType != null;
+        	if (parentType == null) return null;
             switch (parentType) {
 
             case TYPE_PARAMETERS:
@@ -322,7 +322,7 @@ class AstUtil {
             break;
 
         case GENERIC_START:
-            assert parentType != null;
+        	if (parentType == null) return null;
             switch (parentType) {
 
             case TYPE_PARAMETERS:
@@ -360,7 +360,7 @@ class AstUtil {
             break;
 
         case IDENT:
-            assert parentType != null;
+        	if (parentType == null) return null;
             switch (parentType) {
 
             case ANNOTATION:                   return NAME__ANNO;
@@ -403,7 +403,7 @@ class AstUtil {
             }
 
         case LCURLY:
-            assert parentType != null;
+        	if (parentType == null) return null;
             switch (parentType) {
 
             case LITERAL_SWITCH: return L_CURLY__SWITCH;
@@ -450,7 +450,7 @@ class AstUtil {
             return parentType == LocalTokenType.CLASS_DEF ? CLASS__CLASS_DECL : CLASS__CLASS_LITERAL;
 
         case LITERAL_DEFAULT:
-            assert parentType != null;
+        	if (parentType == null) return null;
             switch (parentType) {
 
             case ANNOTATION_MEMBER_VALUE_PAIR:
@@ -478,7 +478,7 @@ class AstUtil {
             return STATIC__STATIC_INIT;
 
         case LPAREN:
-            assert parentType != null;
+        	if (parentType == null) return null;
             switch (parentType) {
 
             case ANNOTATION:           return L_PAREN__ANNO;
@@ -505,7 +505,7 @@ class AstUtil {
             }
 
         case RBRACK:
-            assert parentType != null;
+        	if (parentType == null) return null;
             switch (parentType) {
 
             case ARRAY_DECLARATOR: return R_BRACK__ARRAY_DECL;
@@ -515,7 +515,7 @@ class AstUtil {
             break;
 
         case RCURLY:
-            assert parentType != null;
+        	if (parentType == null) return null;
             switch (parentType) {
 
             case LITERAL_SWITCH: return R_CURLY__SWITCH;
@@ -591,7 +591,7 @@ class AstUtil {
             break;
 
         case RPAREN:
-            assert parentType != null;
+        	if (parentType == null) return null;
             switch (parentType) {
 
             case ANNOTATION:           return R_PAREN__ANNO;
@@ -622,7 +622,7 @@ class AstUtil {
             }
 
         case SEMI:
-            assert parentType != null;
+            if (parentType == null) return null;
             switch (parentType) {
 
             case PACKAGE_DEF:          return SEMI__PACKAGE_DECL;
@@ -686,7 +686,7 @@ class AstUtil {
             break;
 
         case SLIST:
-            assert parentType != null;
+        	if (parentType == null) return null;
             switch (parentType) {
 
             case STATIC_INIT:          return L_CURLY__STATIC_INIT;
