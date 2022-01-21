@@ -97,7 +97,7 @@ class AstUtil {
 
     /**
      * Converts the given {@link DetailAST} into a {@link JavaElement}. In some cases, this is a one-to-one mapping,
-     * but in others one {@link DetailAST} can repsresent one of <i>several</i> {@link JavaElement}s. E.g. the
+     * but in others one {@link DetailAST} can represent one of <i>several</i> {@link JavaElement}s. E.g. the
      * colon can appear in a SWITCH-CASE, a SWITCH-DEFAULT, in an enhanced FOR statement and in a ternary
      * expression ({@code a ? b : c}).
      */
@@ -250,7 +250,6 @@ class AstUtil {
 
             case ANNOTATION:     return AT__ANNO;
             case ANNOTATION_DEF: return AT__ANNO_DECL;
-            default:             assert false : parentType;
             }
             break;
 
@@ -285,7 +284,7 @@ class AstUtil {
             switch (parentType) {
 
             case TYPE_PARAMETERS:
-                assert grandParentType != null;
+                if (grandParentType == null) break;
                 switch (grandParentType) {
 
                 case METHOD_DEF:
@@ -295,10 +294,6 @@ class AstUtil {
                 case CLASS_DEF:
                 case INTERFACE_DEF:
                     return R_ANGLE__TYPE_PARAMS;
-
-                default:
-                    assert false : grandParentType;
-                    return null;
                 }
 
             case TYPE_ARGUMENTS:
@@ -315,9 +310,6 @@ class AstUtil {
                         || tt == LocalTokenType.IMPLEMENTS_CLAUSE
                     ) ? R_ANGLE__TYPE_ARGS : R_ANGLE__METH_INVOCATION_TYPE_ARGS;
                 }
-
-            default:
-                assert false : parentType;
             }
             break;
 
@@ -326,7 +318,7 @@ class AstUtil {
             switch (parentType) {
 
             case TYPE_PARAMETERS:
-                assert grandParentType != null;
+                if (grandParentType == null) break;
                 switch (grandParentType) {
 
                 case METHOD_DEF:
@@ -336,10 +328,6 @@ class AstUtil {
                 case CLASS_DEF:
                 case INTERFACE_DEF:
                     return L_ANGLE__TYPE_PARAMS;
-
-                default:
-                    assert false : grandParentType;
-                    return null;
                 }
 
             case TYPE_ARGUMENTS:
@@ -353,9 +341,6 @@ class AstUtil {
                     || grandParentType == LocalTokenType.EXTENDS_CLAUSE
                     || grandParentType == LocalTokenType.IMPLEMENTS_CLAUSE
                 ) ? L_ANGLE__TYPE_ARGS : L_ANGLE__METH_INVOCATION_TYPE_ARGS;
-
-            default:
-                assert false : parentType;
             }
             break;
 
@@ -409,7 +394,7 @@ class AstUtil {
             case LITERAL_SWITCH: return L_CURLY__SWITCH;
 
             case OBJBLOCK:
-                assert grandParentType != null;
+                if (grandParentType == null) break;
                 switch (grandParentType) {
 
                 case ENUM_CONSTANT_DEF: return L_CURLY__ENUM_CONST;
@@ -418,21 +403,16 @@ class AstUtil {
                 case INTERFACE_DEF:
                 case ANNOTATION_DEF:
                 case ENUM_DEF:
+                case RECORD_DEF:
                     return nextSiblingType == LocalTokenType.RCURLY ? L_CURLY__EMPTY_TYPE_DECL : L_CURLY__TYPE_DECL;
 
                 case LITERAL_NEW:
                     return nextSiblingType == LocalTokenType.RCURLY ? L_CURLY__EMPTY_ANON_CLASS : L_CURLY__ANON_CLASS;
-
-                default:
-                    assert false : grandParentType;
                 }
                 break;
 
             case ARRAY_INIT:
                 return nextSiblingType == LocalTokenType.RCURLY ? L_CURLY__EMPTY_ARRAY_INIT : L_CURLY__ARRAY_INIT;
-
-            default:
-                assert false : parentType;
             }
             break;
 
@@ -510,7 +490,6 @@ class AstUtil {
 
             case ARRAY_DECLARATOR: return R_BRACK__ARRAY_DECL;
             case INDEX_OP:         return R_BRACK__INDEX;
-            default:               assert false : parentType;
             }
             break;
 
@@ -527,7 +506,7 @@ class AstUtil {
                 return Cs820.getPreviousSibling(ast) == null ? R_CURLY__EMPTY_ARRAY_INIT : R_CURLY__ARRAY_INIT;
 
             case OBJBLOCK:
-                assert grandParentType != null;
+                if (grandParentType == null) break;
                 switch (grandParentType) {
 
                 case ENUM_CONSTANT_DEF: return R_CURLY__ENUM_CONST_DECL;
@@ -536,6 +515,7 @@ class AstUtil {
                 case INTERFACE_DEF:
                 case ANNOTATION_DEF:
                 case ENUM_DEF:
+                case RECORD_DEF:
                     return previousSiblingType == LocalTokenType.LCURLY ? R_CURLY__EMPTY_TYPE_DECL : R_CURLY__TYPE_DECL;
 
                 case LITERAL_NEW:
@@ -544,14 +524,11 @@ class AstUtil {
                         ? R_CURLY__EMPTY_ANON_CLASS
                         : R_CURLY__ANON_CLASS
                     );
-
-                default:
-                    assert false : grandParentType;
                 }
                 break;
 
             case SLIST:
-                assert grandParentType != null;
+                if (grandParentType == null) break;
                 switch (grandParentType) {
 
                 case INSTANCE_INIT:        return R_CURLY__INSTANCE_INIT;
@@ -579,14 +556,11 @@ class AstUtil {
 
                 case LAMBDA:
                     return Cs820.getPreviousSibling(ast) == null ? R_CURLY__EMPTY_LAMBDA : R_CURLY__LAMBDA;
-
-                default:
-                    assert false : grandParentType;
+                    
+                case SWITCH_RULE:
+                    return R_CURLY__SWITCH;
                 }
                 break;
-
-            default:
-                assert false : parentType;
             }
             break;
 
@@ -645,6 +619,7 @@ class AstUtil {
             case LITERAL_WHILE:
             case LITERAL_ASSERT:
             case LITERAL_THROW:
+            case LITERAL_YIELD:
                 return SEMI__STATEMENT;
 
             case LITERAL_FOR:
@@ -680,8 +655,8 @@ class AstUtil {
             case RESOURCES:
                 return SEMI__RESOURCES;
 
-            default:
-                assert false : parentType;
+            case SWITCH_RULE:
+                return SEMI__SWITCH_RULE;
             }
             break;
 
@@ -758,8 +733,7 @@ class AstUtil {
             break;
 
         case EOF:
-            assert false : "Unexpected token '" + ast + "' (" + type + ')';
-            return null;
+            break;
         }
 
         assert false : (

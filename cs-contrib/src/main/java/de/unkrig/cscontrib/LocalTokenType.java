@@ -217,7 +217,22 @@ enum LocalTokenType {
     //   BLOCK_COMMENT_END
     //   COMMENT_CONTENT
 
-    // These token types were added in CheckStyle version ???:
+    // These token types were added between CheckStyle versions 8.21 and 8.45.1:
+    COMPACT_CTOR_DEF,
+    LITERAL_NON_SEALED,
+    LITERAL_PERMITS,
+    LITERAL_RECORD,
+    LITERAL_SEALED,
+    LITERAL_YIELD,
+    PATTERN_VARIABLE_DEF,
+    PERMITS_CLAUSE,
+    RECORD_COMPONENT_DEF,
+    RECORD_COMPONENTS,
+    RECORD_DEF,
+    SWITCH_RULE,
+    TEXT_BLOCK_CONTENT,
+    TEXT_BLOCK_LITERAL_BEGIN,
+    TEXT_BLOCK_LITERAL_END,
 
     // All other CS tokens map to THIS LocalTokenType.
     UNKNOWN_TOKEN

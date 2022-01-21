@@ -2110,6 +2110,15 @@ enum JavaElement {
      * </dl>
      */
     SEMI__STATIC_IMPORT,
+    
+    /**
+     * TODO.
+     * <dl>
+     *   <dt>Example:</dt>
+     *   <dd><tt>switch (x) { case 1 -> "It's a ONE"<font color="red">;</font></tt> }</dd>
+     * </dl>
+     */
+    SEMI__SWITCH_RULE,
 
     /**
      * TODO.
