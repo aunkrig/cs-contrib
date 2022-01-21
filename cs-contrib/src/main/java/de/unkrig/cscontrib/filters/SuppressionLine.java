@@ -28,12 +28,12 @@ package de.unkrig.cscontrib.filters;
 
 import java.lang.ref.WeakReference;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import com.google.common.collect.Lists;
 import com.puppycrawl.tools.checkstyle.TreeWalkerAuditEvent;
 import com.puppycrawl.tools.checkstyle.TreeWalkerFilter;
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
@@ -251,7 +251,7 @@ class SuppressionLine extends AutomaticBean implements TreeWalkerFilter {
 
     private String moduleIdFormat;
 
-    private final List<Tag> magicLines = Lists.newArrayList();
+    private final List<Tag> magicLines = new ArrayList<Tag>();
 
     /**
      * References the current FileContents for this filter.
