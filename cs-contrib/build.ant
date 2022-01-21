@@ -1,0 +1,31 @@
+<project>
+
+	<property name="MAVEN_REPO" location="C:/dev/mavenrepo" />
+
+	<target name="csdoc" description="Generate message files.">
+
+		<javadoc
+			doclet="de.unkrig.doclet.cs.CsDoclet"
+			docletpath="${MAVEN_REPO}/de/unkrig/doclet-cs/1.1.1-SNAPSHOT/doclet-cs-1.1.1-SNAPSHOT-jar-with-dependencies.jar"
+		>
+
+			<!-- The 'CheckStyle packages' which contain the rules (checks, filters) to process: -->
+			<package name="de.unkrig.cscontrib.checks"        />
+			<package name="de.unkrig.cscontrib.filters"       />
+
+			<sourcepath path="src/main/java" />
+
+			<!-- Where to create the generated artifacts: -->
+			<arg value="-messages.properties-dir" /><arg file="src/main/resources" />
+
+			<!-- Classes required by the rules: -->
+			<classpath>
+				<pathelement location="${MAVEN_REPO}/de/unkrig/commons/commons-nullanalysis/1.2.14/commons-nullanalysis-1.2.14.jar" />
+				<pathelement location="${MAVEN_REPO}/de/unkrig/doclet-cs-annotation/1.1.1-SNAPSHOT/doclet-cs-annotation-1.1.1-SNAPSHOT.jar" />
+				<pathelement location="${MAVEN_REPO}/com/puppycrawl/tools/checkstyle/8.21/checkstyle-8.21.jar" />
+			</classpath>
+		</javadoc>
+
+		<echo message="*** Now don't forget to synchronize all 'messages_de.properties' files from 'messages.properties'." />
+	</target>
+</project>
