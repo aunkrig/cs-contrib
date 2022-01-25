@@ -109,12 +109,12 @@ class AstUtil {
             type = LocalTokenType.localize(Cs820.getType(ast));
             DetailAST parent = Cs820.getParent(ast);
             if (parent == null) {
-                parentType      = null;
-                grandParentType = null;
+                parentType      = LocalTokenType.UNKNOWN_TOKEN;
+                grandParentType = LocalTokenType.UNKNOWN_TOKEN;
             } else {
                 parentType = LocalTokenType.localize(Cs820.getType(parent));
                 DetailAST grandparent = Cs820.getParent(parent);
-                grandParentType = grandparent == null ? null : LocalTokenType.localize(Cs820.getType(grandparent));
+                grandParentType = grandparent == null ? LocalTokenType.UNKNOWN_TOKEN : LocalTokenType.localize(Cs820.getType(grandparent));
             }
 
             DetailAST previousSibling = Cs820.getPreviousSibling(ast);
@@ -245,7 +245,6 @@ class AstUtil {
             return parentType == LocalTokenType.VARIABLE_DEF ? ASSIGN__VAR_DECL : ASSIGN__ASSIGNMENT;
 
         case AT:
-        	if (parentType == null) return null;
             switch (parentType) {
 
             case ANNOTATION:     return AT__ANNO;
@@ -254,7 +253,6 @@ class AstUtil {
             break;
 
         case COLON:
-        	if (parentType == null) return null;
             switch (parentType) {
 
             case LITERAL_DEFAULT: return COLON__DEFAULT;
@@ -280,11 +278,9 @@ class AstUtil {
             return DOT__SELECTOR;
 
         case GENERIC_END:
-        	if (parentType == null) return null;
             switch (parentType) {
 
             case TYPE_PARAMETERS:
-                if (grandParentType == null) break;
                 switch (grandParentType) {
 
                 case METHOD_DEF:
@@ -314,11 +310,9 @@ class AstUtil {
             break;
 
         case GENERIC_START:
-        	if (parentType == null) return null;
             switch (parentType) {
 
             case TYPE_PARAMETERS:
-                if (grandParentType == null) break;
                 switch (grandParentType) {
 
                 case METHOD_DEF:
@@ -345,7 +339,6 @@ class AstUtil {
             break;
 
         case IDENT:
-        	if (parentType == null) return null;
             switch (parentType) {
 
             case ANNOTATION:                   return NAME__ANNO;
@@ -388,13 +381,11 @@ class AstUtil {
             }
 
         case LCURLY:
-        	if (parentType == null) return null;
             switch (parentType) {
 
             case LITERAL_SWITCH: return L_CURLY__SWITCH;
 
             case OBJBLOCK:
-                if (grandParentType == null) break;
                 switch (grandParentType) {
 
                 case ENUM_CONSTANT_DEF: return L_CURLY__ENUM_CONST;
@@ -430,7 +421,6 @@ class AstUtil {
             return parentType == LocalTokenType.CLASS_DEF ? CLASS__CLASS_DECL : CLASS__CLASS_LITERAL;
 
         case LITERAL_DEFAULT:
-        	if (parentType == null) return null;
             switch (parentType) {
 
             case ANNOTATION_MEMBER_VALUE_PAIR:
@@ -458,7 +448,6 @@ class AstUtil {
             return STATIC__STATIC_INIT;
 
         case LPAREN:
-        	if (parentType == null) return null;
             switch (parentType) {
 
             case ANNOTATION:           return L_PAREN__ANNO;
@@ -485,7 +474,6 @@ class AstUtil {
             }
 
         case RBRACK:
-        	if (parentType == null) return null;
             switch (parentType) {
 
             case ARRAY_DECLARATOR: return R_BRACK__ARRAY_DECL;
@@ -494,7 +482,6 @@ class AstUtil {
             break;
 
         case RCURLY:
-        	if (parentType == null) return null;
             switch (parentType) {
 
             case LITERAL_SWITCH: return R_CURLY__SWITCH;
@@ -506,7 +493,6 @@ class AstUtil {
                 return Cs820.getPreviousSibling(ast) == null ? R_CURLY__EMPTY_ARRAY_INIT : R_CURLY__ARRAY_INIT;
 
             case OBJBLOCK:
-                if (grandParentType == null) break;
                 switch (grandParentType) {
 
                 case ENUM_CONSTANT_DEF: return R_CURLY__ENUM_CONST_DECL;
@@ -528,7 +514,6 @@ class AstUtil {
                 break;
 
             case SLIST:
-                if (grandParentType == null) break;
                 switch (grandParentType) {
 
                 case INSTANCE_INIT:        return R_CURLY__INSTANCE_INIT;
@@ -565,7 +550,6 @@ class AstUtil {
             break;
 
         case RPAREN:
-        	if (parentType == null) return null;
             switch (parentType) {
 
             case ANNOTATION:           return R_PAREN__ANNO;
@@ -596,7 +580,6 @@ class AstUtil {
             }
 
         case SEMI:
-            if (parentType == null) return null;
             switch (parentType) {
 
             case PACKAGE_DEF:          return SEMI__PACKAGE_DECL;
@@ -661,7 +644,6 @@ class AstUtil {
             break;
 
         case SLIST:
-        	if (parentType == null) return null;
             switch (parentType) {
 
             case STATIC_INIT:          return L_CURLY__STATIC_INIT;
@@ -749,7 +731,6 @@ class AstUtil {
         );
 
         return null;
-
     }
 
     /**

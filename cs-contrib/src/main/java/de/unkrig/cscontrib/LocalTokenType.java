@@ -81,7 +81,7 @@ enum LocalTokenType {
     ENUM,
     ENUM_CONSTANT_DEF,
     ENUM_DEF,
-    EOF,
+    EOF, // <= Existed until CS 8.45, and is gone with CS 9.2.1!?
     EQUAL,
     EXPR,
     EXTENDS_CLAUSE,
@@ -247,11 +247,17 @@ enum LocalTokenType {
         } else {
 
             // Find the corresponding constant in 'TokenTypes'.
+            int delocalized;
             try {
-                this.delocalized = (Integer) TokenTypes.class.getField(name).get(null);
+                delocalized = (Integer) TokenTypes.class.getField(name).get(null);
+            } catch (NoSuchFieldException nsfe) {
+                // We are running against an old CS version, in which the token does not yet exist.
+                delocalized = -1;
             } catch (Exception e) {
                 throw new ExceptionInInitializerError(e);
             }
+            
+            this.delocalized = delocalized;
         }
     }
     private final int delocalized;

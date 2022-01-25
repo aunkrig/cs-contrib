@@ -7,7 +7,7 @@
   
   <groupId>de.unkrig.checkstyle</groupId>
   <artifactId>cs-contrib</artifactId>
-  <version>1.0.8-SNAPSHOT</version>
+  <version>1.0.8</version>
 
   <name>de.unkrig.cs-contrib - Additional checks, filters and quickfixes for CheckStyle and Eclipse-CS</name>
   <description>
@@ -98,6 +98,9 @@
         <configuration>
           <quiet>true</quiet>
           <additionalparam>-Xdoclint:none</additionalparam>
+
+          <!-- Workaround for a JDK 11 bug https://stackoverflow.com/questions/62531431 -->
+          <source>8</source>
         </configuration>
         <executions>
           <execution>
