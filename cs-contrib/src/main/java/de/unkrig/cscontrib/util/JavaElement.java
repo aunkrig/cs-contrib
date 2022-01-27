@@ -2015,7 +2015,7 @@ enum JavaElement {
      * TODO.
      * <dl>
      *   <dt>Example:</dt>
-     *   <dd><tt>for (int i = 0&lt;font color="red">;</font> i < 3;...</tt></dd>
+     *   <dd><tt>for (int i = 0<font color="red">;</font> i &lt; 3;...</tt></dd>
      * </dl>
      */
     SEMI__FOR_INIT_CONDITION,
