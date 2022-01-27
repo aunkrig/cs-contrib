@@ -229,16 +229,6 @@ class SuppressionRegex extends AutomaticBean implements Filter {
     }
 
     /**
-     * Same as {pattern.matcher(subject).find()}, except that iff the <var>pattern</var> contains captured subsequence
-     * references, then these are first expanded from the <var>capturedSubsequences</var> and then the
-     * <var>pattern</var> is re-compiled before it is applied.
-     */
-    private boolean
-    find(Pattern pattern, Matcher capturedSubsequences, String subject) {
-        return matcher(pattern, capturedSubsequences, subject).find();
-    }
-
-    /**
      * Same as {pattern.matcher(subject)}, except that iff the <var>pattern</var> contains  captured subsequence
      * references, then these are first expanded from the <var>capturedSubsequences</var> and then the
      * <var>pattern</var> is re-compiled before it is applied.
