@@ -249,6 +249,7 @@ class AstUtil {
 
             case ANNOTATION:     return AT__ANNO;
             case ANNOTATION_DEF: return AT__ANNO_DECL;
+            default:             break;
             }
             break;
 
@@ -290,6 +291,9 @@ class AstUtil {
                 case CLASS_DEF:
                 case INTERFACE_DEF:
                     return R_ANGLE__TYPE_PARAMS;
+
+                default:
+                    break;
                 }
 
             case TYPE_ARGUMENTS:
@@ -306,6 +310,9 @@ class AstUtil {
                         || tt == LocalTokenType.IMPLEMENTS_CLAUSE
                     ) ? R_ANGLE__TYPE_ARGS : R_ANGLE__METH_INVOCATION_TYPE_ARGS;
                 }
+
+            default:
+                break;
             }
             break;
 
@@ -322,6 +329,9 @@ class AstUtil {
                 case CLASS_DEF:
                 case INTERFACE_DEF:
                     return L_ANGLE__TYPE_PARAMS;
+
+                default:
+                    break;
                 }
 
             case TYPE_ARGUMENTS:
@@ -335,6 +345,9 @@ class AstUtil {
                     || grandParentType == LocalTokenType.EXTENDS_CLAUSE
                     || grandParentType == LocalTokenType.IMPLEMENTS_CLAUSE
                 ) ? L_ANGLE__TYPE_ARGS : L_ANGLE__METH_INVOCATION_TYPE_ARGS;
+
+            default:
+                break;
             }
             break;
 
@@ -399,11 +412,17 @@ class AstUtil {
 
                 case LITERAL_NEW:
                     return nextSiblingType == LocalTokenType.RCURLY ? L_CURLY__EMPTY_ANON_CLASS : L_CURLY__ANON_CLASS;
+
+                default:
+                    break;
                 }
                 break;
 
             case ARRAY_INIT:
                 return nextSiblingType == LocalTokenType.RCURLY ? L_CURLY__EMPTY_ARRAY_INIT : L_CURLY__ARRAY_INIT;
+
+            default:
+                break;
             }
             break;
 
@@ -478,6 +497,7 @@ class AstUtil {
 
             case ARRAY_DECLARATOR: return R_BRACK__ARRAY_DECL;
             case INDEX_OP:         return R_BRACK__INDEX;
+            default:               break;
             }
             break;
 
@@ -510,6 +530,9 @@ class AstUtil {
                         ? R_CURLY__EMPTY_ANON_CLASS
                         : R_CURLY__ANON_CLASS
                     );
+
+                default:
+                    break;
                 }
                 break;
 
@@ -544,7 +567,13 @@ class AstUtil {
                     
                 case SWITCH_RULE:
                     return R_CURLY__SWITCH;
+
+                default:
+                    break;
                 }
+                break;
+
+            default:
                 break;
             }
             break;
@@ -640,6 +669,9 @@ class AstUtil {
 
             case SWITCH_RULE:
                 return SEMI__SWITCH_RULE;
+
+            default:
+                break;
             }
             break;
 
@@ -711,10 +743,29 @@ class AstUtil {
             // These are the 'virtual' tokens, i.e. token which are not uniquely related to a physical token.
             return null;
 
+        case COMPACT_CTOR_DEF: // TODO ???
+        case LITERAL_NON_SEALED:
+        case LITERAL_PERMITS:
+        case LITERAL_RECORD:
+        case LITERAL_SEALED:
+        case LITERAL_YIELD:
+        case PATTERN_VARIABLE_DEF:
+        case PERMITS_CLAUSE:
+        case RECORD_COMPONENTS:
+        case RECORD_COMPONENT_DEF:
+        case RECORD_DEF:
+        case SWITCH_RULE:
+        case TEXT_BLOCK_CONTENT:
+        case TEXT_BLOCK_LITERAL_BEGIN:
+        case TEXT_BLOCK_LITERAL_END:
+            break;
+            
         case UNKNOWN_TOKEN:
             break;
 
         case EOF:
+            break;
+        default:
             break;
         }
 
