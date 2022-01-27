@@ -101,7 +101,7 @@ class WrapArrayInitCheck extends AbstractWrapCheck {
      * Whether multiple array initializer values in one line are allowed. Example:
      * <pre>
      * String[] x = {
-     *     "a", "b",   // <= Two values in one line.
+     *     "a", "b",   // &lt;= Two values in one line.
      *     "c"
      * };
      */

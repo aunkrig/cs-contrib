@@ -59,7 +59,7 @@ enum JavaElement {
      * The "{@code &}" operator that separates the bounds in a wildcard type argument.
      * <dl>
      *   <dt>Example:</dt>
-     *   <dd><tt>&lt;T extends MyClass <font color="red">&amp;</font> MyInterface></tt></dd>
+     *   <dd><tt>&lt;T extends MyClass <font color="red">&amp;</font> MyInterface&gt;</tt></dd>
      * </dl>
      */
     AND__TYPE_BOUND,
@@ -268,7 +268,7 @@ enum JavaElement {
      * The conditional "{@code &&}" operator in a logical expression.
      * <dl>
      *   <dt>Example:</dt>
-     *   <dd><tt>a <font color="red">&&</font> b</tt></dd>
+     *   <dd><tt>a <font color="red">&amp;&amp;</font> b</tt></dd>
      * </dl>
      */
     CONDITIONAL_AND,
@@ -455,7 +455,7 @@ enum JavaElement {
      * The "{@code extends}" keyword in a type bound.
      * <dl>
      *   <dt>Example:</dt>
-     *   <dd><tt>List&lt;T <font color="red">extends</font> MyClass></tt></dd>
+     *   <dd><tt>List&lt;T <font color="red">extends</font> MyClass&gt;</tt></dd>
      * </dl>
      */
     EXTENDS__TYPE_BOUND,
@@ -509,7 +509,7 @@ enum JavaElement {
      * The "{@code for}" keyword in a FOR statement or an ENHANCED FOR statement.
      * <dl>
      *   <dt>Example:</dt>
-     *   <dd><tt><font color="red">for</font> (int i = 0; i < 3; i++) {</tt></dd>
+     *   <dd><tt><font color="red">for</font> (int i = 0; i &lt; 3; i++) {</tt></dd>
      *   <dd><tt><font color="red">for</font> (Object o : list) {</tt></dd>
      * </dl>
      */
@@ -519,7 +519,7 @@ enum JavaElement {
      * The "{@code >}" operator in an arithmetic expression.
      * <dl>
      *   <dt>Example:</dt>
-     *   <dd><tt>a <font color="red">></font> b</tt></dd>
+     *   <dd><tt>a <font color="red">&gt;</font> b</tt></dd>
      * </dl>
      */
     GREATER,
@@ -528,7 +528,7 @@ enum JavaElement {
      * The "{@code >=}" operator in an arithmetic expression.
      * <dl>
      *   <dt>Example:</dt>
-     *   <dd><tt>a <font color="red">>=</font> b</tt></dd>
+     *   <dd><tt>a <font color="red">&gt;=</font> b</tt></dd>
      * </dl>
      */
     GREATER_EQUAL,
@@ -546,7 +546,7 @@ enum JavaElement {
      * The "{@code implements}" keyword in a class declaration.
      * <dl>
      *   <dt>Example:</dt>
-     *   <dd><tt>List&lt;T <font color="red">implements</font> MyInterface1, MyInterface2></tt></dd>
+     *   <dd><tt>List&lt;T <font color="red">implements</font> MyInterface1, MyInterface2&gt;</tt></dd>
      * </dl>
      */
     IMPLEMENTS,
@@ -614,7 +614,7 @@ enum JavaElement {
      * The left angle bracket "{@code <}" in the type parameters of a method declaration.
      * <dl>
      *   <dt>Example:</dt>
-     *   <dd><tt>public <font color="red">&lt;</font>T extends Number> void meth(T parm) {</tt></dd>
+     *   <dd><tt>public <font color="red">&lt;</font>T extends Number&gt; void meth(T parm) {</tt></dd>
      * </dl>
      */
     L_ANGLE__METH_DECL_TYPE_PARAMS,
@@ -623,7 +623,7 @@ enum JavaElement {
      * The left angle bracket "{@code <}" in the type arguments of a method invocation.
      * <dl>
      *   <dt>Example:</dt>
-     *   <dd><tt>MyClass.<font color="red">&lt;</font>Double>meth(x)</tt></dd>
+     *   <dd><tt>MyClass.<font color="red">&lt;</font>Double&gt;meth(x)</tt></dd>
      * </dl>
      */
     L_ANGLE__METH_INVOCATION_TYPE_ARGS,
@@ -632,7 +632,7 @@ enum JavaElement {
      * The left angle bracket "{@code <}" in type arguments.
      * <dl>
      *   <dt>Example:</dt>
-     *   <dd><tt>MyClass<font color="red">&lt;</font>String> x;</tt></dd>
+     *   <dd><tt>MyClass<font color="red">&lt;</font>String&gt; x;</tt></dd>
      * </dl>
      */
     L_ANGLE__TYPE_ARGS,
@@ -641,7 +641,7 @@ enum JavaElement {
      * The left angle bracket "{@code <}" keyword in parametrized class or interface declarations.
      * <dl>
      *   <dt>Example:</dt>
-     *   <dd><tt>class MyClass<font color="red">&lt;</font>T extends Number> {</tt></dd>
+     *   <dd><tt>class MyClass<font color="red">&lt;</font>T extends Number&gt; {</tt></dd>
      * </dl>
      */
     L_ANGLE__TYPE_PARAMS,
@@ -978,7 +978,7 @@ enum JavaElement {
      * TODO.
      * <dl>
      *   <dt>Example:</dt>
-     *   <dd><tt>Runnable ru = <font color="red">(</font>) -> { ...</tt></dd>
+     *   <dd><tt>Runnable ru = <font color="red">(</font>) -&gt; { ...</tt></dd>
      * </dl>
      */
     L_PAREN__LAMBDA_PARAMS,
@@ -1228,7 +1228,7 @@ enum JavaElement {
      * The name of an implicitly typed parameter in a lambda.
      * <dl>
      *   <dt>Example:</dt>
-     *   <dd><tt>Foo foo = (<font color="red">param</font>) -> {};</tt></dd>
+     *   <dd><tt>Foo foo = (<font color="red">param</font>) -&gt; {};</tt></dd>
      * </dl>
      *
      * @see #NAME__PARAM
@@ -1260,7 +1260,7 @@ enum JavaElement {
      * <dl>
      *   <dt>Examples:</dt>
      *   <dd><tt>void meth(String <font color="red">param</font>)</tt></dd>
-     *   <dd><tt>Foo foo = (String <font color="red">param</font>) -> {};</tt> (since Java 8)</dd>
+     *   <dd><tt>Foo foo = (String <font color="red">param</font>) -&gt; {};</tt> (since Java 8)</dd>
      * </dl>
      *
      * @see #NAME__INFERRED_PARAM
@@ -1484,7 +1484,7 @@ enum JavaElement {
      * TODO.
      * <dl>
      *   <dt>Example:</dt>
-     *   <dd><tt>List&lt;<font color="red">?</font> extends InputStream></tt></dd>
+     *   <dd><tt>List&lt;<font color="red">?</font> extends InputStream&gt;</tt></dd>
      * </dl>
      */
     QUESTION__WILDCARD_TYPE,
@@ -1493,7 +1493,7 @@ enum JavaElement {
      * TODO.
      * <dl>
      *   <dt>Example:</dt>
-     *   <dd><tt>public &lt;T extends Number<font color="red">></font> void meth(T parm) {</tt></dd>
+     *   <dd><tt>public &lt;T extends Number<font color="red">&gt;</font> void meth(T parm) {</tt></dd>
      * </dl>
      */
     R_ANGLE__METH_DECL_TYPE_PARAMS,
@@ -1502,7 +1502,7 @@ enum JavaElement {
      * TODO.
      * <dl>
      *   <dt>Example:</dt>
-     *   <dd><tt>MyClass.&lt;Double<font color="red">></font>meth(x)</tt></dd>
+     *   <dd><tt>MyClass.&lt;Double<font color="red">&gt;</font>meth(x)</tt></dd>
      * </dl>
      */
     R_ANGLE__METH_INVOCATION_TYPE_ARGS,
@@ -1511,7 +1511,7 @@ enum JavaElement {
      * TODO.
      * <dl>
      *   <dt>Example:</dt>
-     *   <dd><tt>MyClass&lt;String<font color="red">></font></tt></dd>
+     *   <dd><tt>MyClass&lt;String<font color="red">&gt;</font></tt></dd>
      * </dl>
      */
     R_ANGLE__TYPE_ARGS,
@@ -1520,7 +1520,7 @@ enum JavaElement {
      * TODO.
      * <dl>
      *   <dt>Example:</dt>
-     *   <dd><tt>class MyClass&lt;T extends Number<font color="red">></font> {</tt></dd>
+     *   <dd><tt>class MyClass&lt;T extends Number<font color="red">&gt;</font> {</tt></dd>
      * </dl>
      */
     R_ANGLE__TYPE_PARAMS,
@@ -1934,7 +1934,7 @@ enum JavaElement {
      * TODO.
      * <dl>
      *   <dt>Example:</dt>
-     *   <dd><tt>a <font color="red">>></font> 3</tt></dd>
+     *   <dd><tt>a <font color="red">&gt;&gt;</font> 3</tt></dd>
      * </dl>
      */
     RIGHT_SHIFT,
@@ -1943,7 +1943,7 @@ enum JavaElement {
      * TODO.
      * <dl>
      *   <dt>Example:</dt>
-     *   <dd><tt>a <font color="red">>>=</font> 2</tt></dd>
+     *   <dd><tt>a <font color="red">&gt;&gt;=</font> 2</tt></dd>
      * </dl>
      */
     RIGHT_SHIFT_ASSIGN,
@@ -1997,7 +1997,7 @@ enum JavaElement {
      * TODO.
      * <dl>
      *   <dt>Example:</dt>
-     *   <dd><tt>for (...; i < 3<font color="red">;</font>) {</tt></dd>
+     *   <dd><tt>for (...; i &lt; 3<font color="red">;</font>) {</tt></dd>
      * </dl>
      */
     SEMI__FOR_CONDITION_NO_UPDATE,
@@ -2006,7 +2006,7 @@ enum JavaElement {
      * TODO.
      * <dl>
      *   <dt>Example:</dt>
-     *   <dd><tt>for (...; i < 3<font color="red">;</font> i++) {</tt></dd>
+     *   <dd><tt>for (...; i &lt; 3<font color="red">;</font> i++) {</tt></dd>
      * </dl>
      */
     SEMI__FOR_CONDITION_UPDATE,
@@ -2015,7 +2015,7 @@ enum JavaElement {
      * TODO.
      * <dl>
      *   <dt>Example:</dt>
-     *   <dd><tt>for (int i = 0<font color="red">;</font> i < 3;...</tt></dd>
+     *   <dd><tt>for (int i = 0&lt;font color="red">;</font> i < 3;...</tt></dd>
      * </dl>
      */
     SEMI__FOR_INIT_CONDITION,
@@ -2115,7 +2115,7 @@ enum JavaElement {
      * TODO.
      * <dl>
      *   <dt>Example:</dt>
-     *   <dd><tt>switch (x) { case 1 -> "It's a ONE"<font color="red">;</font></tt> }</dd>
+     *   <dd><tt>switch (x) { case 1 -&gt; "It's a ONE"<font color="red">;</font></tt> }</dd>
      * </dl>
      */
     SEMI__SWITCH_RULE,
@@ -2208,7 +2208,7 @@ enum JavaElement {
      * TODO.
      * <dl>
      *   <dt>Example:</dt>
-     *   <dd><tt>List&lt;T <font color="red">super</font> MyClass></tt></dd>
+     *   <dd><tt>List&lt;T <font color="red">super</font> MyClass&gt;</tt></dd>
      * </dl>
      */
     SUPER__TYPE_BOUND,
@@ -2308,7 +2308,7 @@ enum JavaElement {
      * TODO.
      * <dl>
      *   <dt>Example:</dt>
-     *   <dd><tt>a <font color="red">>>></font> 3</tt></dd>
+     *   <dd><tt>a <font color="red">&gt;&gt;&gt;</font> 3</tt></dd>
      * </dl>
      */
     UNSIGNED_RIGHT_SHIFT,
@@ -2317,7 +2317,7 @@ enum JavaElement {
      * TODO.
      * <dl>
      *   <dt>Example:</dt>
-     *   <dd><tt>a <font color="red">>>>=</font> 2</tt></dd>
+     *   <dd><tt>a <font color="red">&gt;&gt;&gt;=</font> 2</tt></dd>
      * </dl>
      */
     UNSIGNED_RIGHT_SHIFT_ASSIGN,
@@ -2345,7 +2345,7 @@ enum JavaElement {
      * TODO.
      * <dl>
      *   <dt>Example:</dt>
-     *   <dd><tt>do { ... } <font color="red">while</font> (a > 0);</tt></dd>
+     *   <dd><tt>do { ... } <font color="red">while</font> (a &gt; 0);</tt></dd>
      * </dl>
      */
     WHILE__DO,
@@ -2354,7 +2354,7 @@ enum JavaElement {
      * TODO.
      * <dl>
      *   <dt>Example:</dt>
-     *   <dd><tt><font color="red">while</font> (a > 0) { ... }</tt></dd>
+     *   <dd><tt><font color="red">while</font> (a &gt; 0) { ... }</tt></dd>
      * </dl>
      */
     WHILE__WHILE,

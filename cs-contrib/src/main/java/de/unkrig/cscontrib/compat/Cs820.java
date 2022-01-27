@@ -53,8 +53,8 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
  * </p>
  * <pre>
  * $ zzfind target/classes -name '**.class' -echo '*** ${path}' -disassemble |
- * > egrep '^\*\*\*|invokeinterface com.puppycrawl.tools.checkstyle.api.DetailAST' |
- * > less
+ * &gt; egrep '^\*\*\*|invokeinterface com.puppycrawl.tools.checkstyle.api.DetailAST' |
+ * &gt; less
  * $
  * </pre>
  */
